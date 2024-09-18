@@ -25,5 +25,13 @@ properties
 
 ```
 
+## 需要保留的字段
+ID,
+City,
+State,
+Station Name,
+Latitude,
+Longitude,
+
 ## References
 - https://www.cnblogs.com/wangsongbai/p/13444667.html
