@@ -9,3 +9,10 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 // add marker
 var marker = L.marker([51.5, -0.09]).addTo(map);
+marker.bindPopup("<b>Hello world!</b><br>I am a popup.");
+
+// get current viewCenter and zoom level
+console.log(map.getCenter());
+console.log(map.getZoom());
+// get the latlngBounds of the current view
+console.log(map.getBounds());
