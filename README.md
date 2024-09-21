@@ -38,5 +38,8 @@ https://observablehq.com
 - https://github.com/CartoDB/basemap-styles
 ## plugin
 - https://github.com/joker-x/Leaflet.geoCSV
+- https://github.com/Leaflet/Leaflet.markercluster/tree/master
+- https://github.com/robertleeplummerjr/Leaflet.glify
+- https://blog.sumbera.com/2014/06/08/leaflet-webgl-many-points-rendering/
 ## References
 - https://www.cnblogs.com/wangsongbai/p/13444667.html
