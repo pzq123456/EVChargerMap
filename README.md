@@ -35,7 +35,30 @@ Longitude,
 
 https://observablehq.com
 ## 底图
-- https://github.com/CartoDB/basemap-styles
+> - see : https://github.com/CartoDB/basemap-styles
+
+```js
+    L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://carto.com/">Carto</a>'
+    }).addTo(map);
+```
+
+- 底图有如下样式参数。
+```
+light_all,
+dark_all,
+light_nolabels,
+light_only_labels,
+dark_nolabels,
+dark_only_labels,
+rastertiles/voyager,
+rastertiles/voyager_nolabels,
+rastertiles/voyager_only_labels,
+rastertiles/voyager_labels_under
+```
+
+
 ## plugin
 - https://github.com/joker-x/Leaflet.geoCSV
 - https://github.com/Leaflet/Leaflet.markercluster/tree/master
