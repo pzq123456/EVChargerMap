@@ -1,5 +1,3 @@
-// import { L } from './index.js';
-
 /* Copyright (c) 2012 the authors listed at the following URL, and/or
 the authors of referenced articles or incorporated external code:
 http://en.literateprograms.org/Quickhull_(Javascript)?action=history&offset=20120410175256

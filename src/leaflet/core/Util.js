@@ -24,6 +24,9 @@ export function extend(dest, ...args) {
 // Last unique ID used by [`stamp()`](#util-stamp)
 export let lastId = 0;
 
+export function isArray(obj) {
+	return Object.prototype.toString.call(obj) === '[object Array]';
+}
 // @function stamp(obj: Object): Number
 // Returns the unique ID of an object, assigning it one if it doesn't have it.
 export function stamp(obj) {

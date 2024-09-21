@@ -1,6 +1,3 @@
-// import { L } from './index.js';
-
-
 /**
  * Adds 1 public method to MCG and 1 to L.Marker to facilitate changing
  * markers' icon options and refreshing their icon and their parent clusters

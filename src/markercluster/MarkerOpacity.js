@@ -1,5 +1,3 @@
-// import { L } from './index.js';
-
 /*
 * Extends L.Marker to include two extra methods: clusterHide and clusterShow.
 * 

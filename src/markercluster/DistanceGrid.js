@@ -1,4 +1,3 @@
-// import { L } from './index.js';
 
 L.DistanceGrid = function (cellSize) {
 	this._cellSize = cellSize;

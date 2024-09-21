@@ -1,5 +1,3 @@
-// import { L } from './index.js';
-
 export var MarkerCluster = L.MarkerCluster = L.Marker.extend({
 	options: L.Icon.prototype.options,
 

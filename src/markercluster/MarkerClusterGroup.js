@@ -1,10 +1,6 @@
-// import { L } from './index.js';
-
-
 /*
  * L.MarkerClusterGroup extends L.FeatureGroup by clustering the markers contained within
  */
-
 export var MarkerClusterGroup = L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	options: {

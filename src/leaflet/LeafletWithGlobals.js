@@ -1,5 +1,7 @@
-import * as L from './Leaflet.js';
+import * as oldL from './Leaflet.js';
 export * from './Leaflet.js';
+
+const L = Object.assign({}, oldL, {}); // fix the error: 对象无法拓展
 
 export default L;
 
