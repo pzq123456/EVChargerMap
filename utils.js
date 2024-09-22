@@ -11,7 +11,7 @@ function setElementSize(element, width, height) {
     element.style.height = height + 'px';
 }
 
-export function init(element) {
+export function initDom(element) {
     let { width, height } = getScreenSize();
     let margin = 20;
     setElementSize(element, width - margin, height - margin);
