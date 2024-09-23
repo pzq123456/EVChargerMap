@@ -26,7 +26,7 @@ export function initCanvasLayer() {
             // 保存所有数据点坐标
             this._data = [];
 
-            this._originalData = null;
+            this._originalData = []; 
 
             this._hoveredPoint = null;
 
@@ -36,15 +36,20 @@ export function initCanvasLayer() {
 
         _customPopupRenderer(info){
             return `<div>
-                <h3>Info</h3>
-                <p>Latitude: ${info[0]}</p>
-                <p>Longitude: ${info[1]}</p>
+                ${info.toString()}
             </div>`;
         },
 
         setData(data, getLatLng = function (d) { return d; }) {
             this._data = data.map(getLatLng);
             this._originalData = data;
+            this._resetCanvas();
+        },
+
+        // 追加数据
+        appendData(data, getLatLng = function (d) { return d; }) {
+            this._data = this._data.concat(data.map(getLatLng));
+            this._originalData = this._originalData.concat(data);
             this._resetCanvas();
         },
 
@@ -59,7 +64,7 @@ export function initCanvasLayer() {
                 let popup = L.popup({
                     maxWidth: 500, // 最大宽度
                     minWidth: 150, // 最小宽度
-                    maxHeight: 200, // 最大高度
+                    // maxHeight: 200, // 最大高度
                     autoPan: true, // 自动平移以确保 Popup 完全显示在视口内
                     autoPanPaddingTopLeft: L.point(10, 10), // 设置弹窗上方和左侧的平移边距
                     autoPanPaddingBottomRight: L.point(10, 10), // 设置弹窗下方和右侧的平移边距
@@ -95,26 +100,73 @@ export function initCanvasLayer() {
 
         // 在 Canvas 上绘制自定义内容
         _drawCanvas: function () {
+            let radius = 5; // 半径随着缩放级别变化
+            let zoom = this._map.getZoom();
 
-            // 绘制每个数据点
-            for (var i = 0; i < this._data.length; i++) {
-                var latLng = this._data[i];
-                var point = this._map.latLngToContainerPoint(latLng);
+            if (zoom >= 13) {
+                radius = 15;
+            } else if (zoom >= 10) {
+                radius = 7;
+            } else {
+                radius = 1;
+            }
+
+            // 并行绘制所有数据点
+            this._data.forEach((latLng, index) => {
+                let point = this._map.latLngToContainerPoint(latLng);
 
                 // 默认绘制红色点
                 this._ctx.beginPath();
-                this._ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI, false);
+                this._ctx.arc(point.x, point.y, radius, 0, 2 * Math.PI, false);
                 this._ctx.fillStyle = 'rgba(255,0,0,0.8)';
                 this._ctx.fill();
-            }
 
-            // 如果有鼠标悬停的点，绘制为蓝色高亮
-            if (this._hoveredPoint) {
-                this._ctx.beginPath();
-                this._ctx.arc(this._hoveredPoint.x, this._hoveredPoint.y, 20, 0, 2 * Math.PI, false);
-                this._ctx.fillStyle = 'rgba(0,0,255,0.8)'; // 蓝色高亮
-                this._ctx.fill();
-            }
+                // 如果有鼠标悬停的点，绘制为蓝色高亮
+                if (this._hoveredPoint && this._hoveredPointIndex === index) {
+                    this._ctx.beginPath();
+                    this._ctx.arc(this._hoveredPoint.x, this._hoveredPoint.y, radius + 5, 0, 2 * Math.PI, false);
+                    // stroke style
+                    this._ctx.strokeStyle = 'yellow';
+                    this._ctx.lineWidth = 5;
+                    // this._ctx.stroke();
+                    // 虚线
+                    this._ctx.setLineDash([5, 5]);
+                    this._ctx.stroke();
+
+                    // fill style
+                    this._ctx.fillStyle = 'rgba(0,0,0,0.4)';
+                    this._ctx.fill();
+                }
+            });
+            // 绘制每个数据点
+            // for (var i = 0; i < this._data.length; i++) {
+            //     var latLng = this._data[i];
+            //     // console.log(this._data[i]);
+            //     var point = this._map.latLngToContainerPoint(latLng);
+
+            //     // 默认绘制红色点
+            //     this._ctx.beginPath();
+            //     this._ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI, false);
+            //     this._ctx.fillStyle = 'rgba(255,0,0,0.8)';
+            //     this._ctx.fill();
+            // }
+
+            // // 如果有鼠标悬停的点，绘制为蓝色高亮
+            // if (this._hoveredPoint) {
+            //     this._ctx.beginPath();
+            //     this._ctx.arc(this._hoveredPoint.x, this._hoveredPoint.y, 20, 0, 2 * Math.PI, false);
+            //     // stroke style
+            //     this._ctx.strokeStyle = 'yellow';
+            //     this._ctx.lineWidth = 5;
+            //     // this._ctx.stroke();
+            //     // 虚线
+            //     this._ctx.setLineDash([5, 5]);
+            //     this._ctx.stroke();
+
+            //     // fill style
+            //     this._ctx.fillStyle = 'rgba(0,0,0,0.4)';
+            //     this._ctx.fill();
+            // }
         },
 
         // 查找最近的数据点
