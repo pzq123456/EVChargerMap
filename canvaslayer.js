@@ -20,7 +20,7 @@ export function initCanvasLayer() {
             // 监听地图的视图变化事件（缩放、平移）
             this._map.on('moveend', this._resetCanvas, this);
             this._map.on('mousemove', this._onMouseMove, this); // 监听鼠标移动事件
-
+            this._map.on('zoomend', this._onZoomEnd, this); // 监听缩放事件
             this._map.on('click', this._onClick, this); // 添加点击事件
 
             // 保存所有数据点坐标
@@ -31,6 +31,10 @@ export function initCanvasLayer() {
             this._hoveredPoint = null;
 
             // 绘制初始图形
+            this._resetCanvas();
+        },
+
+        _onZoomEnd: function () {
             this._resetCanvas();
         },
 
@@ -84,6 +88,8 @@ export function initCanvasLayer() {
             L.DomUtil.remove(this._canvas);
             this._map.off('moveend', this._resetCanvas, this);
             this._map.off('mousemove', this._onMouseMove, this);
+            this._map.off('zoomend', this._onZoomEnd, this);
+            this._map.off('click', this._onClick, this);
         },
 
         // 重绘 Canvas，当地图平移或缩放时调用
@@ -100,16 +106,25 @@ export function initCanvasLayer() {
 
         // 在 Canvas 上绘制自定义内容
         _drawCanvas: function () {
-            let radius = 5; // 半径随着缩放级别变化
+            let radius; // 半径随着缩放级别变化
             let zoom = this._map.getZoom();
 
-            if (zoom >= 13) {
-                radius = 15;
-            } else if (zoom >= 10) {
-                radius = 7;
-            } else {
+            // 根据缩放级别动态调整半径
+            if (zoom <= 6) {
                 radius = 1;
+            } else if (zoom <= 10) {
+                radius = 2;
             }
+            else if (zoom <= 12) {
+                radius = 3;
+            }
+            else if (zoom <= 14) {
+                radius = 4;
+            }
+            else {
+                radius = 6;
+            }
+
 
             // 并行绘制所有数据点
             this._data.forEach((latLng, index) => {
@@ -118,55 +133,27 @@ export function initCanvasLayer() {
                 // 默认绘制红色点
                 this._ctx.beginPath();
                 this._ctx.arc(point.x, point.y, radius, 0, 2 * Math.PI, false);
-                this._ctx.fillStyle = 'rgba(255,0,0,0.8)';
+                // 科幻蓝绿色 透明
+                this._ctx.fillStyle = 'rgba(25, 250, 200, 0.8)';
                 this._ctx.fill();
-
-                // 如果有鼠标悬停的点，绘制为蓝色高亮
-                if (this._hoveredPoint && this._hoveredPointIndex === index) {
-                    this._ctx.beginPath();
-                    this._ctx.arc(this._hoveredPoint.x, this._hoveredPoint.y, radius + 5, 0, 2 * Math.PI, false);
-                    // stroke style
-                    this._ctx.strokeStyle = 'yellow';
-                    this._ctx.lineWidth = 5;
-                    // this._ctx.stroke();
-                    // 虚线
-                    this._ctx.setLineDash([5, 5]);
-                    this._ctx.stroke();
-
-                    // fill style
-                    this._ctx.fillStyle = 'rgba(0,0,0,0.4)';
-                    this._ctx.fill();
-                }
             });
-            // 绘制每个数据点
-            // for (var i = 0; i < this._data.length; i++) {
-            //     var latLng = this._data[i];
-            //     // console.log(this._data[i]);
-            //     var point = this._map.latLngToContainerPoint(latLng);
 
-            //     // 默认绘制红色点
-            //     this._ctx.beginPath();
-            //     this._ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI, false);
-            //     this._ctx.fillStyle = 'rgba(255,0,0,0.8)';
-            //     this._ctx.fill();
-            // }
+            // 如果有鼠标悬停的点，绘制为蓝色高亮
+            if (this._hoveredPoint) {
+                this._ctx.beginPath();
+                this._ctx.arc(this._hoveredPoint.x, this._hoveredPoint.y, radius + 5, 0, 2 * Math.PI, false);
+                // stroke style
+                this._ctx.strokeStyle = 'yellow';
+                this._ctx.lineWidth = 5;
+                // this._ctx.stroke();
+                // 虚线
+                this._ctx.setLineDash([5, 5]);
+                this._ctx.stroke();
 
-            // // 如果有鼠标悬停的点，绘制为蓝色高亮
-            // if (this._hoveredPoint) {
-            //     this._ctx.beginPath();
-            //     this._ctx.arc(this._hoveredPoint.x, this._hoveredPoint.y, 20, 0, 2 * Math.PI, false);
-            //     // stroke style
-            //     this._ctx.strokeStyle = 'yellow';
-            //     this._ctx.lineWidth = 5;
-            //     // this._ctx.stroke();
-            //     // 虚线
-            //     this._ctx.setLineDash([5, 5]);
-            //     this._ctx.stroke();
-
-            //     // fill style
-            //     this._ctx.fillStyle = 'rgba(0,0,0,0.4)';
-            //     this._ctx.fill();
-            // }
+                // fill style
+                this._ctx.fillStyle = 'rgba(0,0,0,0.4)';
+                this._ctx.fill();
+            }
         },
 
         // 查找最近的数据点
@@ -192,13 +179,13 @@ export function initCanvasLayer() {
 
         // 鼠标移动事件处理函数
         _onMouseMove: function (e) {
+            // 判断鼠标左键是否按下
+            if (e.originalEvent.buttons !== 0) {
+                return;
+            }
             var latLng = this._map.containerPointToLatLng(L.point(e.containerPoint.x, e.containerPoint.y));
             var point = this._map.latLngToContainerPoint(latLng);
-            // console.log(point);
 
-            // 查找最近的数据点
-            // var closestPoint = this._findClosestPoint(point);
-            // let closestPoint = this._findClosestPoint(point).point;
             let { index, point: closestPoint } = this._findClosestPoint(point);
 
             // 如果最近的点距离小于 10 像素，高亮显示
@@ -219,16 +206,16 @@ export function initCanvasLayer() {
             var dy = point1.y - point2.y;
             return Math.sqrt(dx * dx + dy * dy);
         },
+
+        
     });
 
     // set options
     L.canvasLayer = function (customPopupRenderer) {
-        // return new L.CanvasLayer().extend({
-        //     _customPopupRenderer: customPopupRenderer
-        // });
-
         let canvasLayer = new L.CanvasLayer();
         canvasLayer._customPopupRenderer = customPopupRenderer;
         return canvasLayer;
     };
 }
+
+function generateHeatmapData(data, map) {}

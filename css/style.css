@@ -1,5 +1,9 @@
 /* 自定义 Popup 样式 */
 .custom-popup .leaflet-popup-content-wrapper {
     background: #ffffffab;
-    border: 1px solid gray;
+}
+
+/* popup 的尖角 */
+.custom-popup .leaflet-popup-tip {
+    background: #ffffffab;
 }
