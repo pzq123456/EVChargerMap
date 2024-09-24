@@ -56,7 +56,7 @@
 	};
 
 	info.update = function (props) {
-		const contents = props ? `<b>${props.name}</b><br />${props.density} people / mi<sup>2</sup>` : 'Hover over a state';
+		const contents = props ? `<b>${props.name}</b><br />${props.count} people / mi<sup>2</sup>` : 'Hover over a state';
 		this._div.innerHTML = `<h4>US Population Density</h4>${contents}`;
 	};
 
@@ -81,7 +81,7 @@
 			color: 'white',
 			dashArray: '3',
 			fillOpacity: 0.7,
-			fillColor: getColor(feature.properties.density)
+			fillColor: getColor(feature.properties.count)
 		};
 	}
 
