@@ -27,7 +27,9 @@ function customPopupRenderer(info){
 }
 
 const canvasLayer = L.canvasLayer(customPopupRenderer);
+layerControl.addOverlay(canvasLayer, 'Canvas Layer');
 canvasLayer.addTo(map);
+console.log(canvasLayer._data);
 
 // 获取 CSV 文件并解析为数组
 fetch('data/USApoints.csv')

@@ -1,4 +1,5 @@
 export function initCanvasLayer() {
+
     L.CanvasLayer = L.Layer.extend({
         // 在添加图层到地图时调用
         onAdd: function (map) {
@@ -21,12 +22,15 @@ export function initCanvasLayer() {
             this._map.on('moveend', this._resetCanvas, this);
             this._map.on('mousemove', this._onMouseMove, this); // 监听鼠标移动事件
             this._map.on('zoomend', this._onZoomEnd, this); // 监听缩放事件
+
             this._map.on('click', this._onClick, this); // 添加点击事件
 
-            // 保存所有数据点坐标
-            this._data = [];
 
-            this._originalData = []; 
+
+            //若已有_data 或 _originalData 则保留
+            if(!this._data || !this._originalData){
+                this._resetData();
+            }
 
             this._hoveredPoint = null;
 
@@ -42,6 +46,11 @@ export function initCanvasLayer() {
             return `<div>
                 ${info.toString()}
             </div>`;
+        },
+
+        _resetData(){
+            this._data = [];
+            this._originalData = [];
         },
 
         setData(data, getLatLng = function (d) { return d; }) {
@@ -133,8 +142,8 @@ export function initCanvasLayer() {
                 // 默认绘制红色点
                 this._ctx.beginPath();
                 this._ctx.arc(point.x, point.y, radius, 0, 2 * Math.PI, false);
-                // 科幻蓝绿色 透明
-                this._ctx.fillStyle = 'rgba(25, 250, 200, 0.8)';
+                // 黄色 密度高的地方变成白色
+                this._ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
                 this._ctx.fill();
             });
 
@@ -142,10 +151,8 @@ export function initCanvasLayer() {
             if (this._hoveredPoint) {
                 this._ctx.beginPath();
                 this._ctx.arc(this._hoveredPoint.x, this._hoveredPoint.y, radius + 5, 0, 2 * Math.PI, false);
-                // stroke style
                 this._ctx.strokeStyle = 'yellow';
                 this._ctx.lineWidth = 5;
-                // this._ctx.stroke();
                 // 虚线
                 this._ctx.setLineDash([5, 5]);
                 this._ctx.stroke();
@@ -217,5 +224,3 @@ export function initCanvasLayer() {
         return canvasLayer;
     };
 }
-
-function generateHeatmapData(data, map) {}
