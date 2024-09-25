@@ -19,4 +19,6 @@ def get_breaks(df, column, num_breaks):
 # test
 if __name__ == '__main__':
     df = pd.read_csv(PATH_STATES)
-    breaks = get_breaks(df, 'count', 8)
+    breaks = get_breaks(df, 'count', 16)
+    # 仅打印整数
+    print([int(b) for b in breaks])

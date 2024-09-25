@@ -1,6 +1,11 @@
 export function initCanvasLayer() {
 
     L.CanvasLayer = L.Layer.extend({
+        initialize: function () {
+            this._data = [];
+            this._originalData = [];
+        },
+        
         // 在添加图层到地图时调用
         onAdd: function (map) {
             this._map = map;
@@ -19,18 +24,9 @@ export function initCanvasLayer() {
             overlayPane.appendChild(this._canvas);
 
             // 监听地图的视图变化事件（缩放、平移）
-            this._map.on('moveend', this._resetCanvas, this);
             this._map.on('mousemove', this._onMouseMove, this); // 监听鼠标移动事件
-            this._map.on('zoomend', this._onZoomEnd, this); // 监听缩放事件
-
+            this._map.on('zoom', this._onZoom, this); // 监听缩放事件
             this._map.on('click', this._onClick, this); // 添加点击事件
-
-
-
-            //若已有_data 或 _originalData 则保留
-            if(!this._data || !this._originalData){
-                this._resetData();
-            }
 
             this._hoveredPoint = null;
 
@@ -38,7 +34,7 @@ export function initCanvasLayer() {
             this._resetCanvas();
         },
 
-        _onZoomEnd: function () {
+        _onZoom: function () {
             this._resetCanvas();
         },
 
@@ -95,22 +91,25 @@ export function initCanvasLayer() {
         onRemove: function (map) {
             // 移除 Canvas 元素
             L.DomUtil.remove(this._canvas);
-            this._map.off('moveend', this._resetCanvas, this);
+            
+            // 移除事件监听
             this._map.off('mousemove', this._onMouseMove, this);
-            this._map.off('zoomend', this._onZoomEnd, this);
+            this._map.off('zoom', this._onZoom, this);
             this._map.off('click', this._onClick, this);
         },
 
         // 重绘 Canvas，当地图平移或缩放时调用
         _resetCanvas: function () {
-            var topLeft = this._map.containerPointToLayerPoint([0, 0]);
-            L.DomUtil.setPosition(this._canvas, topLeft);
+            if(this._map){
+                var topLeft = this._map.containerPointToLayerPoint([0, 0]);
+                L.DomUtil.setPosition(this._canvas, topLeft);
+                // 清空当前的 Canvas
+                this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
 
-            // 清空当前的 Canvas
-            this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
+                // 调用自定义的绘制逻辑
+                this._drawCanvas();
+            }
 
-            // 调用自定义的绘制逻辑
-            this._drawCanvas();
         },
 
         // 在 Canvas 上绘制自定义内容
@@ -142,8 +141,8 @@ export function initCanvasLayer() {
                 // 默认绘制红色点
                 this._ctx.beginPath();
                 this._ctx.arc(point.x, point.y, radius, 0, 2 * Math.PI, false);
-                // 黄色 密度高的地方变成白色
-                this._ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                // 亮黄色
+                this._ctx.fillStyle = "rgba(255, 255, 255)";
                 this._ctx.fill();
             });
 
