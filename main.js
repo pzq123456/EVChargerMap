@@ -43,9 +43,10 @@ const infoUpdate = function (props) {
 
 const geoJsonLayer = L.geoJsonLayer(statesData, mybreaks, mycolors, infoUpdate);
 const canvasLayer = L.canvasLayer(customPopupRenderer);
-layerControl.addOverlay(geoJsonLayer, 'GeoJson Layer');
-layerControl.addOverlay(canvasLayer, 'Canvas Layer');
+layerControl.addOverlay(geoJsonLayer, 'State Station Count');
+layerControl.addOverlay(canvasLayer, 'Charging Stations');
 
+layerControl.expand();
 geoJsonLayer.addTo(map);
 canvasLayer.addTo(map);
 
