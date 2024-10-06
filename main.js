@@ -48,7 +48,7 @@ layerControl.addOverlay(canvasLayer, 'Charging Stations');
 
 layerControl.expand();
 geoJsonLayer.addTo(map);
-// canvasLayer.addTo(map);
+canvasLayer.addTo(map);
 
 
 
