@@ -89,7 +89,6 @@ export function initCanvasLayer() {
             if(this._legend){
                 this._legend.update();
             }
-            // console.log(this._legend);
         },
 
         // 点击事件处理函数
@@ -118,7 +117,7 @@ export function initCanvasLayer() {
                         `<div>
                             lat: ${latLng[0]}<br>
                             lng: ${latLng[1]}<br>
-                            count: ${latLng[2]}
+                            value in grid: ${latLng[2]}
                         </div>`
                     );
                 }
@@ -334,6 +333,7 @@ export function initCanvasLayer() {
 
             const grades = this._stastics.getGrades(this._colors.length);
             const colors = [];
+            labels.push('point level');
 
             for (let i = 0; i < grades.length - 1; i++) {
                 colors.push(this._stastics.mapValue2Color(grades[i], true, this._colors));

@@ -1,3 +1,10 @@
-data/alt_fuel_stations (Jul 13 2024).csv
+# data/alt_fuel_stations (Jul 13 2024).csv
+data/*
 python/.venv/
 .venv/
+
+!data/city_count.csv
+!data/state_count.csv
+!data/us-states.js
+!data/usa.csv
+!data/USApoints.csv

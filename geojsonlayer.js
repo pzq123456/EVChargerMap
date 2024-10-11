@@ -1,19 +1,28 @@
+import { Stastics } from "./stastics.js";
+
 export function initGeoJsonLayer() { // 这一步只是 向L注册了一个新的类，但是并没有实例化
 
     L.GeoJsonLayer = L.Layer.extend({
-        initialize: function (data, grades, colors, infoUpdate) {
-            this._data = data;
-            this._grades = grades;
-            this._colors = colors;
+        initialize: function ( infoUpdate) {
+            this._stastics = new Stastics(); // 单值统计
+            // this._grades = grades;
+            this._colors = DefaultColors;
             this._infoUpdate = infoUpdate;
         },
 
+        setColors: function (colors) {
+            this._colors = colors;
+            this._legend.update();
+        },
+
         _getColor: function (d) {
-            for (let i = 0; i < this._grades.length; i++) {
-                if (d <= this._grades[i]) {
-                    return this._colors[i];
-                }
-            }
+            // for (let i = 0; i < this._grades.length; i++) {
+            //     if (d <= this._grades[i]) {
+            //         return this._colors[i];
+            //     }
+            // }
+
+            return this._stastics.mapValue2Color(d, false, this._colors);
         },
 
         _style: function (feature) {
@@ -27,6 +36,17 @@ export function initGeoJsonLayer() { // 这一步只是 向L注册了一个新�
             };
         },
 
+        updateData: function (data, getVal = (d) => parseInt(d.properties.count)) {
+            this._data = data;
+            // console.log(data.features);
+            this._stastics.append(data.features, getVal);
+            // console.log(this._stastics);
+            this._geoJson.clearLayers();
+            this._geoJson.addData(data);
+
+            this._legend.update();
+        },
+
         onAdd: function (map) {
             this._map = map;
 
@@ -34,15 +54,14 @@ export function initGeoJsonLayer() { // 这一步只是 向L注册了一个新�
             this._createLegend();
             this._info.addTo(this._map);
 
-
-            this._geoJson = L.geoJson(this._data, {
+            this._geoJson = L.geoJson(DefaultGeoJson,{
                 style: this._style.bind(this),
                 onEachFeature: this._onEachFeature.bind(this)
             });
 
+
             // set onEachFeature
             this._geoJson.addTo(this._map);
-            // console.log(this._info)
             this._legend.addTo(this._map);
         },
 
@@ -115,24 +134,69 @@ export function initGeoJsonLayer() { // 这一步只是 向L注册了一个新�
             // };
         },
 
+        // _createLegend: function () {
+        //     this._legend = L.control({position: 'bottomright'});
+
+        //     this._legend.onAdd = function (map) {
+        //         const div = L.DomUtil.create('div', 'info legend');
+        //         const labels = [];
+        //         let from, to;
+
+        //         for (let i = 0; i < this._colors.length; i++) {
+        //             // from = this._grades[i];
+        //             // to = this._grades[i + 1];
+
+        //             from = this._stastics.getGrades(this._colors.length)[i];
+        //             to = this._stastics.getGrades(this._colors.length)[i + 1];
+
+        //             labels.push(`<i style="background:${this._colors[i]}"></i> ${from}${to ? `&ndash;${to}` : '+'}`);
+                    
+
+        //             // labels.push(`<i style="background:${this._colors[i]}"></i> ${from}${to ? `&ndash;${to}` : '+'}`);
+
+        //         }
+
+        //         div.innerHTML = labels.join('<br>');
+        //         return div;
+        //     }.bind(this);
+        // }
+
         _createLegend: function () {
-            this._legend = L.control({position: 'bottomright'});
+            let legend = L.control({position: 'bottomright'});
 
-            this._legend.onAdd = function (map) {
-                const div = L.DomUtil.create('div', 'info legend');
-                const labels = [];
-                let from, to;
+            legend.onAdd = this._legendHelper.bind(this);
 
-                for (let i = 0; i < this._grades.length; i++) {
-                    from = this._grades[i];
-                    to = this._grades[i + 1];
-
-                    labels.push(`<i style="background:${this._colors[i]}"></i> ${from}${to ? `&ndash;${to}` : '+'}`);
-                }
-
-                div.innerHTML = labels.join('<br>');
-                return div;
+            legend.update = function () {
+                this._legend._container.innerHTML = this._legendHelper().innerHTML;
             }.bind(this);
+
+            return this._legend = legend;
+        },
+
+        _legendHelper: function () {
+            const div = L.DomUtil.create('div', 'info legend');
+
+            const labels = [];
+            let from, to;
+
+            const grades = this._stastics.getGrades(this._colors.length);
+            console.log(grades);
+            const colors = [];
+
+            labels.push('area level');
+
+            for (let i = 0; i < grades.length - 1; i++) {
+                colors.push(this._stastics.mapValue2Color(grades[i], false, this._colors));
+            }
+
+            for (let i = 0; i < grades.length - 1; i++) {
+                from = Math.round(grades[i]);
+                to = Math.round(grades[i + 1]);
+                labels.push(`<i style="background:${colors[i]}"></i> ${from}${to ? `&ndash;${to}` : '+'}`);
+            }
+
+            div.innerHTML = labels.join('<br>');
+            return div;
         }
 
     });
@@ -141,6 +205,14 @@ export function initGeoJsonLayer() { // 这一步只是 向L注册了一个新�
         return new L.GeoJsonLayer(data, grades, colors, infoUpdate);
     }
 }
+
+const DefaultGeoJson = {
+    "type": "FeatureCollection",
+    "features": []
+}
+
+const DefaultColors = ['#f7fcf5', '#e5f5e0', '#c7e9c0', '#a1d99b', '#74c476', '#41ab5d', '#238b45', '#006d2c', '#00441b', '#003d19', '#003617', '#003015', '#002b13', '#002611', '#00200f', '#001b0d', '#00160b']
+
 
 // // test code
 // const map = L.map('map').setView([37.8, -96], 4); // center of US

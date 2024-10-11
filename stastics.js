@@ -14,17 +14,24 @@ export class Stastics{ // 单值统计
     }
 
     update(){
+        this.dropna();
         // console.log(this._data);
         this._max = Math.max(...this._data);
         this._min = Math.min(...this._data);
         this._average = this._data.reduce((a, b) => a + b, 0) / this._data.length;
     }
 
+    dropna(){
+        //drop out NaN, null, undefined
+        this._data = this._data.filter((value) => value !== null && value !== undefined && !isNaN(value));
+    }
+
     append(value, getVal){
         // 将数据添加到数组中
         this._data.push(...value.map(getVal));
+        // console.log(this._data);
         this.update();
-        console.log(this._max, this._min, this._average);
+        // console.log(this._max, this._min, this._average);
     }
 
     // 根据内置的统计值进行值映射
@@ -45,6 +52,7 @@ export class Stastics{ // 单值统计
     }
 
     getGrades(num){ // 获取分级
+        // console.log(this._max, this._min);
         let grades = [];
         let step = (this._max - this._min) / num;
         for (let i = 0; i < num; i++){
