@@ -8,3 +8,4 @@ python/.venv/
 !data/us-states.js
 !data/usa.csv
 !data/USApoints.csv
+!data/us_states.json
