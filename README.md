@@ -1,5 +1,8 @@
 # EVChargerMap
 
+## 行政区划 geojson 数据源
+- CN : https://github.com/GaryBikini/ChinaAdminDivisonSHP
+- EU : https://github.com/leakyMirror/map-of-europe
 ## 充电桩空间分布地图
 1. 充电桩点状空间分布
 2. 指标空间单元分布，最好可以分级呈现（国家、省级、市），点开查看细节

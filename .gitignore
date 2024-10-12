@@ -9,3 +9,4 @@ python/.venv/
 !data/usa.csv
 !data/USApoints.csv
 !data/us_states.json
+!data/GeoJSON
