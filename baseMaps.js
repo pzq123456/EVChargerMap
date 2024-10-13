@@ -14,18 +14,18 @@ let baseMapInfos = [
         style: "dark_all",
         attribution: '&copy; <a href="https://carto.com/">CARTO</a>'
     },
-    {
-        name: "rastertiles/voyager",
-        url: cartodbUrl,
-        style: "rastertiles/voyager",
-        attribution: '&copy; <a href="https://carto.com/">CARTO</a>'
-    },
-    {
-        name: "rastertiles/voyager_nolabels",
-        url: cartodbUrl,
-        style: "rastertiles/voyager_nolabels",
-        attribution: '&copy; <a href="https://carto.com/">CARTO</a>'
-    },
+    // {
+    //     name: "rastertiles/voyager",
+    //     url: cartodbUrl,
+    //     style: "rastertiles/voyager",
+    //     attribution: '&copy; <a href="https://carto.com/">CARTO</a>'
+    // },
+    // {
+    //     name: "rastertiles/voyager_nolabels",
+    //     url: cartodbUrl,
+    //     style: "rastertiles/voyager_nolabels",
+    //     attribution: '&copy; <a href="https://carto.com/">CARTO</a>'
+    // },
     {
         name: "OSM",
         url: OSMUrl,

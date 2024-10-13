@@ -8,23 +8,26 @@ import { getBaseMap } from './utils.js';
 // components
 import {CountrySwitcher} from "./components/country-switcher.js";
 
+initCanvasLayer();
+initGeoJsonLayer();
+
 // 注册 Web Component
 customElements.define('country-switcher', CountrySwitcher);
 const switcher = document.querySelector('country-switcher');
 
-function cn(){
-    // 切换视角 leaflet 动画效果
+function cn() {
+    const animationDuration = 2000; // 动画时长 2 秒（以毫秒为单位）
 
+    // 切换视角 leaflet 动画效果
     map.flyTo([35, 105], 4, {
-        duration: 2,
+        duration: animationDuration / 1000, // 传入秒
         easeLinearity: 0.5,
         animate: true
     });
 
-    // map.setView([35, 105], 4);
     // 获取 CSV 和 GeoJSON 数据并进行处理
-    Promise.all([
-        fetch('data/cn/count.csv')
+    const dataFetchPromise = Promise.all([
+        fetch('data/cn_count.csv')
             .then(response => response.text())
             .then(csvData => new Promise((resolve, reject) => {
                 Papa.parse(csvData, {
@@ -36,21 +39,55 @@ function cn(){
                     error: (error) => reject(error)
                 });
             })),
-        fetch('data/GEOJSON/cn_province.geojson')
+        fetch('data/GeoJSON/cn_province.geojson')
             .then(response => response.json())
     ])
     .then(([csvData, geoJsonData]) => {
-        // 将 CSV 数据合并进 GeoJSON 数据
-        const updatedGeoJson = addColumn2GeoJson(geoJsonData, csvData);
-        // console.log(updatedGeoJson);
-        // 更新或渲染 GeoJSON 图层
-        geoJsonLayer.updateData(updatedGeoJson);
-        geoJsonLayer.updateInfoUpdate(cn_infoUpdate);
-    })
-    .catch(error => {
-        console.error('获取数据或处理出错:', error);
+        // 创建 Worker 实例
+        const worker = new Worker('workers/cngeojson.js');
+
+        return new Promise((resolve, reject) => {
+            // 向 Worker 发送 GeoJSON 和 CSV 数据
+            worker.postMessage({ geoJsonData, csvData });
+
+            // 当 Worker 任务完成时接收数据
+            worker.onmessage = function (e) {
+                const updatedGeoJson = e.data;
+
+                // 终止 Worker
+                worker.terminate();
+                
+                // 解析成功，返回结果
+                resolve(updatedGeoJson);
+            };
+
+            // 捕获 Worker 错误
+            worker.onerror = function (error) {
+                worker.terminate();
+                reject(error);
+            };
+        });
     });
+
+    // 创建一个动画时长的 Promise
+    const animationPromise = new Promise(resolve => {
+        setTimeout(() => {
+            resolve('动画完成');
+        }, animationDuration);
+    });
+
+    // 使用 Promise.race 来决定何时更新数据
+    Promise.all([dataFetchPromise, animationPromise])
+        .then(([updatedGeoJson]) => {
+            // 更新或渲染 GeoJSON 图层，确保动画结束后执行
+            geoJsonLayer.updateData(updatedGeoJson);
+            geoJsonLayer.updateInfoUpdate(cn_infoUpdate);
+        })
+        .catch(error => {
+            console.error('获取数据或处理出错:', error);
+        });
 }
+
 
 function us(){
     // 切换视角
@@ -61,7 +98,7 @@ function us(){
     });
 
     Promise.allSettled([
-        fetch('data/us_states.json').then(response => response.json()),
+        fetch('data/GeoJSON/us_states.json').then(response => response.json()),
         fetch('data/USApoints.csv').then(response => response.text())
     ])
     .then(results => {
@@ -95,6 +132,78 @@ function us(){
     });
 }
 
+function eu(){
+    const animationDuration = 2000; // 动画时长 2 秒（以毫秒为单位）
+
+    map.flyTo([50, 10], 4, {
+        duration: animationDuration / 1000, // 传入秒
+        easeLinearity: 0.5,
+        animate: true
+    });
+
+    // 获取 CSV 和 GeoJSON 数据并进行处理
+    const dataFetchPromise = Promise.all([
+        fetch('data/eu_count.csv')
+            .then(response => response.text())
+            .then(csvData => new Promise((resolve, reject) => {
+                Papa.parse(csvData, {
+                    header: true,
+                    dynamicTyping: true,
+                    skipEmptyLines: true,
+                    worker: true,
+                    complete: (results) => resolve(results.data),
+                    error: (error) => reject(error)
+                });
+            })),
+        fetch('data/GeoJSON/europe.geojson')
+            .then(response => response.json())
+        ])
+        .then(([csvData, geoJsonData]) => {
+            // 创建 Worker 实例
+            const worker = new Worker('workers/eugeojson.js');
+
+            return new Promise((resolve, reject) => {
+                // 向 Worker 发送 GeoJSON 和 CSV 数据
+                worker.postMessage({ geoJsonData, csvData });
+
+                // 当 Worker 任务完成时接收数据
+                worker.onmessage = function (e) {
+                    const updatedGeoJson = e.data;
+
+                    // 终止 Worker
+                    worker.terminate();
+                    
+                    // 解析成功，返回结果
+                    resolve(updatedGeoJson);
+                };
+
+                // 捕获 Worker 错误
+                worker.onerror = function (error) {
+                    worker.terminate();
+                    reject(error);
+                };
+            });
+        });
+
+    // 创建一个动画时长的 Promise
+    const animationPromise = new Promise(resolve => {
+        setTimeout(() => {
+            resolve('动画完成');
+        }, animationDuration);
+    });
+
+    // 使用 Promise
+    Promise.all([dataFetchPromise, animationPromise])
+        .then(([updatedGeoJson]) => {
+            // 更新或渲染 GeoJSON 图层，确保动画结束后执行
+            geoJsonLayer.updateData(updatedGeoJson);
+            geoJsonLayer.updateInfoUpdate(eu_infoUpdate);
+        })
+        .catch(error => {
+            console.error('获取数据或处理出错:', error);
+        });
+}
+
 initDom(document.getElementById('map')); // set the map size to the screen size
 
 let map = L.map('map',
@@ -106,9 +215,6 @@ let map = L.map('map',
 let baseMaps = getBaseMap(baseMapInfos);
 let layerControl = L.control.layers(baseMaps).addTo(map);
 baseMaps["dark_all"].addTo(map);
-
-initCanvasLayer();
-initGeoJsonLayer();
 
 function customPopupRenderer(info){
     // ID,City,State,Station Name,Latitude,Longitude
@@ -122,8 +228,6 @@ function customPopupRenderer(info){
     </div>`;
 }
 
-
-
 const infoUpdate = function (props, data) {
     const contents = props ? `<b>${props.name}</b><br />${props.count} charging stations` : 'Hover over a state';
     this._div.innerHTML = `<h4>US EV Charging Stations</h4>${contents}`;
@@ -131,17 +235,23 @@ const infoUpdate = function (props, data) {
 
 const cn_infoUpdate = function (props, data) {
     const contents = props ? `<b>${props.pr_name}</b><br />${props.count} charging stations` : 'Hover over a state';
-    this._div.innerHTML = `<h4>US EV Charging Stations</h4>${contents}`;
+    this._div.innerHTML = `<h4>China EV Charging Stations</h4>${contents}`;
+}
+
+const eu_infoUpdate = function (props, data) {
+    const contents = props ? `<b>${props.NAME}</b><br />${props.count} charging stations` : 'Hover over a state';
+    this._div.innerHTML = `<h4>Europe EV Charging Stations</h4>${contents}`;
 }
 
 const geoJsonLayer = L.geoJsonLayer(infoUpdate);
 const canvasLayer = L.canvasLayer(customPopupRenderer);
+
 layerControl.addOverlay(geoJsonLayer, 'State Station Count');
 layerControl.addOverlay(canvasLayer, 'Charging Stations');
 
-layerControl.expand();
+// layerControl.expand();
 geoJsonLayer.addTo(map);
-canvasLayer.addTo(map);
+// canvasLayer.addTo(map);
 
 switcher.setCountries([
     {
@@ -154,49 +264,10 @@ switcher.setCountries([
     },
     {
         name: 'Europe',
-        // callback: () => { alert('切换到欧洲'); }
+        callback: eu
     },
-]);
-
-// 简单的前缀匹配或字符匹配算法
-function cn_match(feature, data, minMatchLength = 2) {
-    // console.log(feature, data);
-    const target = feature.pr_name;
-    let matchedIndex = -1;
-
-    // 遍历数据列表
-    for (let i = 0; i < data.length; i++) {
-        const state = data[i].State;
-        // console.log(data[i]);
-
-        // 1. 前缀匹配
-        if (state.startsWith(target.slice(0, minMatchLength))) {
-            matchedIndex = i;
-            break; // 找到前缀匹配，直接返回
-        }
-
-        // 2. 字符匹配
-        let matchCount = 0;
-        for (let j = 0; j < state.length; j++) {
-            if (target.includes(state[j])) {
-                matchCount++;
-            }
-            if (matchCount >= minMatchLength) {
-                matchedIndex = i;
-                break; // 一旦达到最小匹配字符数，退出遍历
-            }
-        }
-        if (matchedIndex !== -1) break; // 如果已经找到匹配的，退出主循环
+    {
+        name: 'global',
+        callback: null
     }
-
-    return data[matchedIndex].count;
-}
-
-function addColumn2GeoJson(geoJson, data, match_fn = cn_match, columnName = "count") {
-    let updatedGeoJson = JSON.parse(JSON.stringify(geoJson));
-    updatedGeoJson.features.forEach((feature, index) => {
-        const matchedValue = match_fn(feature.properties, data);
-        feature.properties[columnName] = matchedValue;
-    });
-    return updatedGeoJson;
-}
+]);

@@ -66,3 +66,12 @@ function randomPointsWithProperties(center, radius, num){
 
     return points;
 }
+
+export function addColumn2GeoJson(geoJson, data, match_fn = eu_match, columnName = 'count') {
+    let updatedGeoJson = JSON.parse(JSON.stringify(geoJson));
+    updatedGeoJson.features.forEach((feature, index) => {
+        const matchedValue = match_fn(feature.properties, data);
+        feature.properties[columnName] = matchedValue;
+    });
+    return updatedGeoJson;
+}

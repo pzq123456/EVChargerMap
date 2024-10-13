@@ -38,8 +38,21 @@ def clean_state():
         df.to_csv("data/usa.csv", index=False)
 
 
+# EU 欧洲 data/eu/eu1.csv
+PATH_EU = "data/eu/eu1.csv"
+# X,Y,value,location_u,location_c,location_l,location_1,COUNTRY,NAME_1,NAME_2
+def count_eu():
+    # 统计国家的数量 并制作csv
+    df = pd.read_csv(PATH_EU)
+    country_count = df['COUNTRY'].value_counts()
+    country_count.to_csv("data/eu/count.csv")
+
 if __name__ == "__main__":
+    # USA
     # clean_data()
     # print("Data cleaned and saved to", SAVE_PATH)
     # count_data()
-    clean_state()
+    # clean_state()
+
+    # EU
+    count_eu()

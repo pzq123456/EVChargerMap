@@ -3,6 +3,9 @@ data/*
 python/.venv/
 .venv/
 
+!data/cn_count.csv
+!data/eu_count.csv
+
 !data/city_count.csv
 !data/state_count.csv
 !data/us-states.js
@@ -10,5 +13,4 @@ python/.venv/
 !data/USApoints.csv
 !data/us_states.json
 !data/GeoJSON
-!data/cn/count.csv
-!data/eu1.csv
+

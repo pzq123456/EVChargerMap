@@ -22,5 +22,16 @@ country-switcher {
 }
 
 body {
-    background-color: #2a2929;
+    background-color: #5c5959;
+}
+
+footer {
+    color: white;
+    /* 上边框 */
+    border-top: 1px solid #ccc;
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
 }

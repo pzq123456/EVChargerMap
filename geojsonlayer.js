@@ -8,6 +8,7 @@ export function initGeoJsonLayer() { // 这一步只是 向L注册了一个新�
             // this._grades = grades;
             this._colors = DefaultColors;
             this._infoUpdate = infoUpdate;
+            this._data = DefaultGeoJson;
         },
 
         setColors: function (colors) {
@@ -32,7 +33,7 @@ export function initGeoJsonLayer() { // 这一步只是 向L注册了一个新�
 
         updateData: function (data, getVal = (d) => parseInt(d.properties.count)) {
             this._data = data;
-            // console.log(data.features);
+            this._stastics.clear();
             this._stastics.append(data.features, getVal);
             // console.log(this._stastics);
             this._geoJson.clearLayers();
@@ -48,11 +49,10 @@ export function initGeoJsonLayer() { // 这一步只是 向L注册了一个新�
             this._createLegend();
             this._info.addTo(this._map);
 
-            this._geoJson = L.geoJson(DefaultGeoJson,{
+            this._geoJson = L.geoJson(this._data, {
                 style: this._style.bind(this),
                 onEachFeature: this._onEachFeature.bind(this)
             });
-
 
             // set onEachFeature
             this._geoJson.addTo(this._map);
