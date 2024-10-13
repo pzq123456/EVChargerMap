@@ -11,3 +11,4 @@ python/.venv/
 !data/us_states.json
 !data/GeoJSON
 !data/cn/count.csv
+!data/eu1.csv
