@@ -11,10 +11,22 @@ function setElementSize(element, width, height) {
     element.style.height = height + 'px';
 }
 
+// 控制元素居中
+function centerElement(element) {
+    let { width, height } = getScreenSize();
+    element.style.position = 'absolute';
+    element.style.left = (width - element.offsetWidth) / 2 + 'px';
+    element.style.top = (height - element.offsetHeight) / 2 + 'px';
+}
+
 export function initDom(element) {
     let { width, height } = getScreenSize();
-    let margin = 20;
-    setElementSize(element, width - margin, height - margin);
+
+    // 80%
+    width = width * 0.8;
+    height = height * 0.8;
+    setElementSize(element, width, height);
+    centerElement(element);
 }
 
 export function getBaseMap(baseMapInfos){
