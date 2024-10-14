@@ -227,8 +227,7 @@ export function initCanvasLayer() {
                     let point = this._map.latLngToContainerPoint(L.latLng(gridInfo[0], gridInfo[1]));
                     let color = this._stastics.mapValue2Color(gridInfo[2], true, this._colors);
 
-                    // radius = Math.log2(gridInfo[2]) * Math.log2(zoom);
-                    radius = Math.pow(2, zoom) / 64 * Math.log2(gridInfo[2]);
+                    radius = Math.pow(2, zoom) / 32 * 8;
 
 
                     this._ctx.beginPath();
@@ -239,7 +238,8 @@ export function initCanvasLayer() {
                 });
 
                 if (this._hoveredPoint) {
-                    radius = Math.pow(2, zoom) / 64 * Math.log2(grid[this._hoveredPointIndex][2]);
+                    radius = Math.pow(2, zoom) / 32 * 8;
+
 
                     this._ctx.beginPath();
                     this._ctx.arc(this._hoveredPoint.x, this._hoveredPoint.y, radius + 5, 0, 2 * Math.PI, true);
@@ -250,36 +250,37 @@ export function initCanvasLayer() {
                     this._ctx.stroke();
                 }
                 
-            }else{
-                // 并行绘制所有数据点
-                this._data.forEach((latLng, index) => {
-                    let point = this._map.latLngToContainerPoint(latLng);
-
-                    let color = "white";
-
-                    if(this._customGetVal){
-                        let value = this._customGetVal(this._originalData[index]);
-                        color = this._stastics.mapValue2Color(value, true, this._colors);
-                    }
-
-                    this._ctx.beginPath();
-                    this._ctx.arc(point.x, point.y, radius, 0, 2 * Math.PI, true);
-                    // 亮黄色
-                    this._ctx.fillStyle = color;
-                    this._ctx.fill();
-                });
-
-                // 如果有鼠标悬停的点，绘制为蓝色高亮
-                if (this._hoveredPoint) {
-                    this._ctx.beginPath();
-                    this._ctx.arc(this._hoveredPoint.x, this._hoveredPoint.y, radius + 5, 0, 2 * Math.PI, true);
-                    this._ctx.strokeStyle = 'yellow';
-                    this._ctx.lineWidth = 5;
-                    // 虚线
-                    this._ctx.setLineDash([5, 5]);
-                    this._ctx.stroke();
-                }
             }
+            // else{
+            //     // 并行绘制所有数据点
+            //     this._data.forEach((latLng, index) => {
+            //         let point = this._map.latLngToContainerPoint(latLng);
+
+            //         let color = "white";
+
+            //         if(this._customGetVal){
+            //             let value = this._customGetVal(this._originalData[index]);
+            //             color = this._stastics.mapValue2Color(value, true, this._colors);
+            //         }
+
+            //         this._ctx.beginPath();
+            //         this._ctx.arc(point.x, point.y, radius, 0, 2 * Math.PI, true);
+            //         // 亮黄色
+            //         this._ctx.fillStyle = color;
+            //         this._ctx.fill();
+            //     });
+
+            //     // 如果有鼠标悬停的点，绘制为蓝色高亮
+            //     if (this._hoveredPoint) {
+            //         this._ctx.beginPath();
+            //         this._ctx.arc(this._hoveredPoint.x, this._hoveredPoint.y, radius + 5, 0, 2 * Math.PI, true);
+            //         this._ctx.strokeStyle = 'yellow';
+            //         this._ctx.lineWidth = 5;
+            //         // 虚线
+            //         this._ctx.setLineDash([5, 5]);
+            //         this._ctx.stroke();
+            //     }
+            // }
 
         },
 

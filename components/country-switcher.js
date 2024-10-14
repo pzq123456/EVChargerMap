@@ -89,6 +89,11 @@ export class CountrySwitcher extends HTMLElement {
         this.updateButtonStates();
     }
 
+    getCurrentCountry() {
+        const activeButton = this.shadowRoot.querySelector('.country-buttons button.active');
+        return activeButton?.innerText;
+    }
+
     renderButtons() {
         this.buttonsContainer.innerHTML = ''; // 清空之前的按钮
         this.slider.style.width = `${100 / this.countries.length}%`; // 动态设置滑块宽度

@@ -15,6 +15,11 @@ initGeoJsonLayer();
 customElements.define('country-switcher', CountrySwitcher);
 const switcher = document.querySelector('country-switcher');
 
+// cache
+let cnGeoJsonData = null;
+let usGeoJsonData = null;
+let euGeoJsonData = null;
+
 function cn() {
     const animationDuration = 2000; // 动画时长 2 秒（以毫秒为单位）
 
@@ -54,6 +59,8 @@ function cn() {
             worker.onmessage = function (e) {
                 const updatedGeoJson = e.data;
 
+                cnGeoJsonData = updatedGeoJson; // 缓存数据
+
                 // 终止 Worker
                 worker.terminate();
                 
@@ -81,7 +88,7 @@ function cn() {
         .then(([updatedGeoJson]) => {
             // 更新或渲染 GeoJSON 图层，确保动画结束后执行
             geoJsonLayer.updateData(updatedGeoJson);
-            geoJsonLayer.updateInfoUpdate(cn_infoUpdate);
+            // geoJsonLayer.updateInfoUpdate(cn_infoUpdate);
         })
         .catch(error => {
             console.error('获取数据或处理出错:', error);
@@ -108,6 +115,10 @@ function us(){
     
         if (geoJsonResult.status === 'fulfilled') {
             geoJsonLayer.updateData(geoJsonResult.value);
+
+            // cache data
+            usGeoJsonData = geoJsonResult.value;
+
         } else {
             console.error('获取 GeoJSON 数据失败:', geoJsonResult.reason);
         }
@@ -170,6 +181,8 @@ function eu(){
                 worker.onmessage = function (e) {
                     const updatedGeoJson = e.data;
 
+                    euGeoJsonData = updatedGeoJson; // 缓存数据
+
                     // 终止 Worker
                     worker.terminate();
                     
@@ -197,7 +210,7 @@ function eu(){
         .then(([updatedGeoJson]) => {
             // 更新或渲染 GeoJSON 图层，确保动画结束后执行
             geoJsonLayer.updateData(updatedGeoJson);
-            geoJsonLayer.updateInfoUpdate(eu_infoUpdate);
+            // geoJsonLayer.updateInfoUpdate(eu_infoUpdate);
         })
         .catch(error => {
             console.error('获取数据或处理出错:', error);
@@ -209,6 +222,7 @@ initDom(document.getElementById('map')); // set the map size to the screen size
 let map = L.map('map',
     {
         renderer: L.canvas(),
+        attributionControl: false // 禁用归属信息
     }
 ).setView([37.8, -96], 4);
 
@@ -233,15 +247,15 @@ const infoUpdate = function (props, data) {
     this._div.innerHTML = `<h4>US EV Charging Stations</h4>${contents}`;
 }
 
-const cn_infoUpdate = function (props, data) {
-    const contents = props ? `<b>${props.pr_name}</b><br />${props.count} charging stations` : 'Hover over a state';
-    this._div.innerHTML = `<h4>China EV Charging Stations</h4>${contents}`;
-}
+// const cn_infoUpdate = function (props, data) {
+//     const contents = props ? `<b>${props.pr_name}</b><br />${props.count} charging stations` : 'Hover over a state';
+//     this._div.innerHTML = `<h4>China EV Charging Stations</h4>${contents}`;
+// }
 
-const eu_infoUpdate = function (props, data) {
-    const contents = props ? `<b>${props.NAME}</b><br />${props.count} charging stations` : 'Hover over a state';
-    this._div.innerHTML = `<h4>Europe EV Charging Stations</h4>${contents}`;
-}
+// const eu_infoUpdate = function (props, data) {
+//     const contents = props ? `<b>${props.NAME}</b><br />${props.count} charging stations` : 'Hover over a state';
+//     this._div.innerHTML = `<h4>Europe EV Charging Stations</h4>${contents}`;
+// }
 
 const geoJsonLayer = L.geoJsonLayer(infoUpdate);
 const canvasLayer = L.canvasLayer(customPopupRenderer);
@@ -268,6 +282,24 @@ switcher.setCountries([
     },
     {
         name: 'global',
-        callback: null
+        callback: () => {
+            map.flyTo([0, 0], 2, {
+                duration: 2,
+                easeLinearity: 0.5,
+                animate: true
+            });
+
+            if (usGeoJsonData) {
+                geoJsonLayer.appendData(usGeoJsonData);
+            }
+
+            if (cnGeoJsonData) {
+                geoJsonLayer.appendData(cnGeoJsonData);
+            }
+
+            if (euGeoJsonData) {
+                geoJsonLayer.appendData(euGeoJsonData);
+            }
+        }
     }
 ]);

@@ -83,8 +83,8 @@ const defaultColors = [ // 红色基调的暖色调
 export class Grid {
     constructor(
         gridBounds = { x: -180, y: -90, w: 360, h: 180 },
-        cellWidth = 0.5,
-        cellHeight = 0.5) {
+        cellWidth = 1,
+        cellHeight = 1) {
         this.gridBounds = gridBounds;  // 整个网格的边界范围
         this.cellWidth = cellWidth;    // 每个单元格的宽度
         this.cellHeight = cellHeight;  // 每个单元格的高度

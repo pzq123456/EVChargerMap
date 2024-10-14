@@ -42,6 +42,13 @@ export function initGeoJsonLayer() { // 这一步只是 向L注册了一个新�
             this._legend.update();
         },
 
+        appendData: function (data, getVal = (d) => parseInt(d.properties.count)) {
+            this._data.features = this._data.features.concat(data);
+            this._stastics.append(data.features, getVal);
+            this._geoJson.addData(data);
+            this._legend.update();
+        },
+
         onAdd: function (map) {
             this._map = map;
 
