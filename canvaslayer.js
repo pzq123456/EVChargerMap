@@ -167,15 +167,16 @@ export function initCanvasLayer() {
                 } else {
                     this._hoveredPoint = null;
                 }
-            }else{
-                let { index, point: closestPoint } = this._findClosestPoint(point);
-                if (closestPoint && this._distanceBetweenPoints(point, closestPoint) < 10) {
-                    this._hoveredPoint = closestPoint;
-                    this._hoveredPointIndex = index;
-                } else {
-                    this._hoveredPoint = null;
-                }
             }
+            // else{
+            //     let { index, point: closestPoint } = this._findClosestPoint(point);
+            //     if (closestPoint && this._distanceBetweenPoints(point, closestPoint) < 10) {
+            //         this._hoveredPoint = closestPoint;
+            //         this._hoveredPointIndex = index;
+            //     } else {
+            //         this._hoveredPoint = null;
+            //     }
+            // }
             // 重绘 Canvas
             this._resetCanvas();
         },
@@ -227,18 +228,20 @@ export function initCanvasLayer() {
                     let point = this._map.latLngToContainerPoint(L.latLng(gridInfo[0], gridInfo[1]));
                     let color = this._stastics.mapValue2Color(gridInfo[2], true, this._colors);
 
-                    radius = Math.pow(2, zoom) / 32 * 8;
+                    radius = Math.pow(2, zoom) / 64 * Math.log2(gridInfo[2] + 1) * 2;
 
 
                     this._ctx.beginPath();
                     this._ctx.arc(point.x, point.y, radius, 0, 2 * Math.PI, true);
+                    // 绘制为正方形 以 point 为中心
+                    // this._ctx.rect(point.x - radius, point.y - radius, radius * 2, radius * 2);
                     // 亮黄色
                     this._ctx.fillStyle = color;
                     this._ctx.fill();
                 });
 
                 if (this._hoveredPoint) {
-                    radius = Math.pow(2, zoom) / 32 * 8;
+                    radius = Math.pow(2, zoom) / 32 * Math.log2(grid[this._hoveredPointIndex][2] + 1) * 2;
 
 
                     this._ctx.beginPath();

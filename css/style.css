@@ -1,3 +1,8 @@
+#map{
+    height: 80vh;
+    width: 90%;
+}
+
 /* 自定义 Popup 样式 */
 .custom-popup .leaflet-popup-content-wrapper {
     background: #ffffffe1;
@@ -17,21 +22,104 @@
     max-height: 100%;
 }
 
-country-switcher {
-    display: block;
-}
+/* country-switcher {
+} */
 
 body {
-    background-color: #5c5959;
+    background-color: #252323;
+}
+
+/* Welcome Section */
+.welcome-section {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    background-image: radial-gradient(circle, #1a1a1a, #000000);
+    padding: 0 1rem;
+}
+
+.welcome-section h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #00b4d8;
+    text-shadow: 2px 2px 5px rgba(0, 180, 216, 0.6);
+}
+
+.welcome-section p {
+    font-size: 1.3rem;
+    max-width: 700px;
+    margin: 0 auto 3rem;
+    line-height: 1.6;
+    /* 左对齐 */
+    text-align: left;
+    color: #e3edfb8d;
+}
+
+/* Scroll Button Styling */
+.scroll-btn {
+    padding: 15px 30px;
+    background-color: rgba(0, 180, 216, 0.3);
+    color: white;
+    border: 2px solid #00b4d8;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    animation: bounce 2s infinite;
+}
+
+.scroll-btn:hover {
+    background-color: rgba(0, 180, 216, 0.5);
+    transform: scale(1.1);
+}
+
+.scroll-icon {
+    margin-top: 20px;
+    display: inline-block;
+    font-size: 2.5rem;
+    color: #00b4d8;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(10px);
+    }
+}
+
+/* Main Content Section */
+.main-content {
+    height: 100vh;
+    display: flex;
+    /* 纵向排列元素 */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+/* .main-content h2 {
+    font-size: 2.5rem;
+    color: #00b4d8;
+} */
+
+/* Smooth scroll behavior */
+html {
+    scroll-behavior: smooth;
 }
 
 footer {
     color: white;
     /* 上边框 */
-    border-top: 1px solid #ccc;
     text-align: center;
     padding: 10px;
-    position: fixed;
     bottom: 0;
     width: 100%;
 }

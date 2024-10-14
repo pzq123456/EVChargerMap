@@ -217,7 +217,7 @@ function eu(){
         });
 }
 
-initDom(document.getElementById('map')); // set the map size to the screen size
+// initDom(document.getElementById('map')); // set the map size to the screen size
 
 let map = L.map('map',
     {
