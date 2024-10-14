@@ -1,33 +1,32 @@
-#map{
-    height: 80vh;
-    width: 90%;
+/* Global Styles */
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: #020e1a;
+    color: #100f0f;
 }
 
-/* 自定义 Popup 样式 */
+/* Map and Popups */
+#map {
+    height: 80vh;
+    width: 90%;
+    margin: 20px auto;
+}
+
 .custom-popup .leaflet-popup-content-wrapper {
     background: #ffffffe1;
 }
 
-/* popup 的尖角 */
 .custom-popup .leaflet-popup-tip {
     background: #ffffffab;
 }
 
-.info { padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } .info h4 { margin: 0 0 5px; color: #777; }
-.legend { text-align: left; line-height: 18px; color: #555; } .legend i { width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }
-.leaflet-container {
-    height: 400px;
-    width: 600px;
-    max-width: 100%;
-    max-height: 100%;
-}
-
-/* country-switcher {
-} */
-
-body {
-    background-color: #252323;
-}
+.info { padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; }
+.info h4 { margin: 0 0 5px; color: #777; }
+.legend { text-align: left; line-height: 18px; color: #555; }
+.legend i { width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }
 
 /* Welcome Section */
 .welcome-section {
@@ -37,89 +36,147 @@ body {
     align-items: center;
     flex-direction: column;
     text-align: center;
-    background-image: radial-gradient(circle, #1a1a1a, #000000);
     padding: 0 1rem;
 }
 
 .welcome-section h1 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    color: #00b4d8;
-    text-shadow: 2px 2px 5px rgba(0, 180, 216, 0.6);
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+    color: #0056b3; /* Darker blue for better contrast */
+    text-shadow: 3px 3px 6px rgba(0, 123, 255, 0.5);
 }
 
 .welcome-section p {
-    font-size: 1.3rem;
-    max-width: 700px;
-    margin: 0 auto 3rem;
-    line-height: 1.6;
-    /* 左对齐 */
+    font-size: 1.5rem;
+    color: #f2f2f2;
     text-align: left;
-    color: #e3edfb8d;
+    line-height: 1.6;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.main-content h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    color: #ffffff;
+    text-shadow: 3px 3px 6px rgba(21, 121, 222, 0.5);
 }
 
 /* Scroll Button Styling */
 .scroll-btn {
-    padding: 15px 30px;
-    background-color: rgba(0, 180, 216, 0.3);
+    padding: 15px 35px;
+    background-color: #0056b3;
     color: white;
-    border: 2px solid #00b4d8;
-    border-radius: 50px;
+    border: none;
+    border-radius: 30px;
     cursor: pointer;
     font-size: 1.2rem;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 3px 10px rgba(0, 123, 255, 0.3);
     animation: bounce 2s infinite;
 }
 
 .scroll-btn:hover {
-    background-color: rgba(0, 180, 216, 0.5);
-    transform: scale(1.1);
+    background-color: #003f8a;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
 }
 
 .scroll-icon {
-    margin-top: 20px;
-    display: inline-block;
-    font-size: 2.5rem;
-    color: #00b4d8;
-    animation: bounce 2s infinite;
+    font-size: 2rem;
+    color: #007bff;
+    margin-top: 10px;
 }
 
+/* Bounce Animation */
 @keyframes bounce {
-    0%, 100% {
+    0%, 20%, 50%, 80%, 100% {
         transform: translateY(0);
     }
-    50% {
-        transform: translateY(10px);
+    40% {
+        transform: translateY(-15px);
     }
-}
-
-/* Main Content Section */
-.main-content {
-    height: 100vh;
-    display: flex;
-    /* 纵向排列元素 */
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-}
-
-/* .main-content h2 {
-    font-size: 2.5rem;
-    color: #00b4d8;
-} */
-
-/* Smooth scroll behavior */
-html {
-    scroll-behavior: smooth;
+    60% {
+        transform: translateY(-7px);
+    }
 }
 
 footer {
+    padding: 1.5rem;
     color: white;
-    /* 上边框 */
     text-align: center;
-    padding: 10px;
-    bottom: 0;
+    font-size: 1rem;
+}
+
+footer a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* Header and Navigation Styles */
+header {
+    background-color: #052a52;
+    color: white;
+    padding: 1rem 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Add a subtle shadow for a modern look */
     width: 100%;
+}
+
+nav {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+nav ul li {
+    margin-left: 20px;
+}
+
+nav ul li:first-child {
+    margin-left: 0;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 500;
+    padding: 10px 15px;
+    transition: color 0.3s ease, background-color 0.3s ease;
+    border-radius: 30px;
+}
+
+nav ul li a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+}
+
+/* Responsive Design for Small Screens */
+@media (max-width: 768px) {
+    nav ul {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    nav ul li {
+        margin: 10px 0;
+    }
+
+    nav ul li a {
+        font-size: 1.2rem;
+    }
 }

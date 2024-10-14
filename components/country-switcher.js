@@ -5,67 +5,79 @@ export class CountrySwitcher extends HTMLElement {
 
         this.shadowRoot.innerHTML = `
             <style>
-            .slider-container {
-                width: 100%;
-                max-width: 500px;
-                margin: 50px auto;
-                position: relative;
-            }
+                /* Slider Container */
+                .slider-container {
+                    width: 100%;
+                    max-width: 500px;
+                    margin: 50px auto;
+                    position: relative;
+                }
 
-            .slider {
-                height: 6px; /* 减小高度，减少视觉冲击 */
-                background: #555; /* 使用中性灰色，低调融入背景 */
-                position: absolute;
-                top: 50px;
-                left: 0;
-                z-index: 1;
-                width: 100%;
-            }
+                /* Slider Track */
+                .slider {
+                    height: 6px;
+                    background: #ddd; /* 灰色背景增加对比度 */
+                    position: absolute;
+                    top: 50px;
+                    left: 0;
+                    z-index: 1;
+                    width: 100%;
+                    border-radius: 3px; /* 圆角处理，增加柔和感 */
+                }
 
-            .slider-button {
-                height: 10px;
-                width: 10px;
-                background: #888; /* 使用柔和的中性灰色 */
-                position: absolute;
-                transition: left 0.3s ease;
-                z-index: 2;
-                box-shadow: none; /* 去掉光晕效果，避免过于突出 */
-            }
+                /* Slider Button */
+                .slider-button {
+                    background: #007bff; /* 主题蓝色 */
+                    height: 4px;
+                    width: 14px;
+                    position: absolute;
+                    transition: left 0.3s ease;
+                    z-index: 2;
+                    border: 2px solid #fff; /* 白色边框增加按钮清晰度 */
+                }
 
-            .country-buttons {
-                display: flex;
-                justify-content: space-between;
-                position: relative;
-                z-index: 3;
-                margin-top: 20px;
-                border-radius: 5px;
-            }
+                /* Country Buttons Container */
+                .country-buttons {
+                    display: flex;
+                    justify-content: space-between;
+                    position: relative;
+                    z-index: 3;
+                    margin-top: 20px;
+                    border-radius: 5px;
+                }
 
-            .country-buttons button {
-                padding: 10px 15px;
-                cursor: pointer;
-                border: 1px solid #555;
-                background-color: #444;
-                color: #ccc;
-                border-radius: 5px;
-                transition: background-color 0.3s ease, transform 0.3s ease;
-            }
+                /* Country Buttons */
+                .country-buttons button {
+                    padding: 10px 15px;
+                    cursor: pointer;
+                    border: 1px solid #007bff; /* 边框采用主题蓝色 */
+                    background-color: white;
+                    color: #007bff; /* 文字颜色采用主题蓝色 */
+                    border-radius: 5px;
+                    transition: background-color 0.3s ease, transform 0.3s ease;
+                }
 
-            .country-buttons button.active {
-                background-color: #1e90ff;
-                color: white;
-                border-color: #1e90ff;
-            }
+                /* Active Button */
+                .country-buttons button.active {
+                    background-color: #1e90ff;
+                    color: white;
+                    border-color: #1e90ff;
+                }
 
-            .country-buttons button.disabled {
-                background-color: #666;
-                color: #999;
-                cursor: not-allowed;
-            }
+                /* Disabled Button */
+                .country-buttons button.disabled {
+                    background-color: #555;
+                    color: #999;
+                    cursor: not-allowed;
+                }
 
-            .country-buttons button:hover:not(.disabled) {
-                background-color: #555;
-            }
+                /* Hover Effect */
+                .country-buttons button:hover:not(.disabled) {
+                    background-color: #007bff; /* 鼠标悬停时，按钮变为主题蓝色 */
+                    color: white; /* 文字颜色变为白色 */
+                    transform: translateY(-2px); /* 轻微上移，增加动感 */
+                }
+
 
             </style>
             <div class="slider-container">
