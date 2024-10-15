@@ -242,11 +242,12 @@ function customPopupRenderer(info){
     </div>`;
 }
 
+
+
 const infoUpdate = function (props, data) {
     const contents = props ? `<b>${props.name}</b><br />${props.count} charging stations` : 'Hover over a state';
     this._div.innerHTML = `<h4>US EV Charging Stations</h4>${contents}`;
 }
-
 // const cn_infoUpdate = function (props, data) {
 //     const contents = props ? `<b>${props.pr_name}</b><br />${props.count} charging stations` : 'Hover over a state';
 //     this._div.innerHTML = `<h4>China EV Charging Stations</h4>${contents}`;
@@ -266,6 +267,27 @@ layerControl.addOverlay(canvasLayer, 'Charging Stations');
 // layerControl.expand();
 geoJsonLayer.addTo(map);
 // canvasLayer.addTo(map);
+
+// C_us();
+
+// function C_us(){
+//     // data\GeoJSON\C\C_us.geojson
+//     fetch('data/GeoJSON/C/C_us.geojson')
+//         .then(response => response.json())
+//         .then(geoJsonData => {
+//             console.log('获取数据成功:', geoJsonData);
+//             geoJsonLayer.updateData(geoJsonData, (d) => parseFloat(d.properties.V));
+//             console.log('geoJsonLayer:', geoJsonLayer);
+//         })
+//         .catch(error => {
+//             console.error('获取数据出错:', error);
+//         });
+// }
+
+// const c_US_infoUpdate = function (props, data) {
+//     const contents = props ? `<b>${props.NAME_1}-${props.NAME_2}</b><br />${props.V} (density)` : 'Hover over a state';
+//     this._div.innerHTML = `<h4>population density</h4>${contents}`;
+// }
 
 switcher.setCountries([
     {

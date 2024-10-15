@@ -14,3 +14,6 @@ python/.venv/
 !data/us_states.json
 !data/GeoJSON
 
+data/GeoJSON/C/C_cn.geojson
+data/GeoJSON/C/C_eu.geojson
+data/GeoJSON/C/C_us.geojson

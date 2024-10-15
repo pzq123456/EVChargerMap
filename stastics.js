@@ -81,6 +81,20 @@ export class Stastics {
     
         return grades;
     }
+
+    // // 等距离
+    // getGrades(num) {
+    //     let grades = [];
+    //     let step = (this._max - this._min) / num;
+    //     for (let i = 0; i <= num; i++) {
+    //         // grades.push(this._min + i * step);
+    //         let grade = this._min + i * step;
+    //         grades.push(grade.toFixed(2));
+    //     }
+    //     // grades 保留两位小数
+
+    //     return grades;
+    // }
     
     
 }

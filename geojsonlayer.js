@@ -9,6 +9,7 @@ export function initGeoJsonLayer() { // 这一步只是 向L注册了一个新�
             this._colors = DefaultColors;
             this._infoUpdate = infoUpdate;
             this._data = DefaultGeoJson;
+            this._getVal = (d) => parseInt(d.properties.count);
         },
 
         setColors: function (colors) {
@@ -22,12 +23,12 @@ export function initGeoJsonLayer() { // 这一步只是 向L注册了一个新�
 
         _style: function (feature) {
             return {
-                weight: 2,
+                weight: 1,
                 opacity: 1,
                 color: 'white',
-                dashArray: '3',
+                // dashArray: '3',
                 fillOpacity: 0.7,
-                fillColor: this._getColor(feature.properties.count)
+                fillColor: this._getColor(this._getVal(feature))
             };
         },
 
@@ -35,16 +36,17 @@ export function initGeoJsonLayer() { // 这一步只是 向L注册了一个新�
             this._data = data;
             this._stastics.clear();
             this._stastics.append(data.features, getVal);
-            // console.log(this._stastics);
+            this._getVal = getVal;
+
             this._geoJson.clearLayers();
             this._geoJson.addData(data);
-
             this._legend.update();
         },
 
         appendData: function (data, getVal = (d) => parseInt(d.properties.count)) {
-            this._data.features = this._data.features.concat(data);
+            this._data.features = this._data.features.concat(data.features);
             this._stastics.append(data.features, getVal);
+            this._getVal = getVal;
             this._geoJson.addData(data);
             this._legend.update();
         },
@@ -137,7 +139,7 @@ export function initGeoJsonLayer() { // 这一步只是 向L注册了一个新�
             let from, to;
 
             const grades = this._stastics.getGrades(this._colors.length);
-            console.log(grades);
+            // console.log(grades);
             const colors = [];
 
             labels.push('area level');
@@ -147,8 +149,8 @@ export function initGeoJsonLayer() { // 这一步只是 向L注册了一个新�
             }
 
             for (let i = 0; i < grades.length - 1; i++) {
-                from = Math.round(grades[i]);
-                to = Math.round(grades[i + 1]);
+                from = grades[i];
+                to = grades[i + 1];
                 labels.push(`<i style="background:${colors[i]}"></i> ${from}${to ? `&ndash;${to}` : '+'}`);
             }
 
