@@ -3,6 +3,11 @@ data/*
 python/.venv/
 .venv/
 
+_pytest
+__pycache__
+
+!data/eu_grid.json
+
 !data/cn_count.csv
 !data/eu_count.csv
 

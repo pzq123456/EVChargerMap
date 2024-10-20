@@ -1,5 +1,5 @@
 import json
-import math
+import numpy as np
 
 class Grid:
     def __init__(self, gridBounds=None, cellWidth=1, cellHeight=1):
@@ -11,22 +11,31 @@ class Grid:
         self.grid = {}
 
     def insert_points(self, points):
-        for point in points:
-            x, y = point
-            # Calculate which grid cell the point belongs to
-            gridX = math.floor((x - self.gridBounds['x']) / self.cellWidth)
-            gridY = math.floor((y - self.gridBounds['y']) / self.cellHeight)
-            key = f"{gridX},{gridY}"
-            
-            # Initialize the grid cell if it doesn't exist
+        # 将点数组转换为 numpy 数组
+        points = np.array(points)
+        x_coords, y_coords = points[:, 0], points[:, 1]
+
+        # 计算每个点所在的网格单元坐标
+        gridX = np.floor((x_coords - self.gridBounds['x']) / self.cellWidth).astype(int)
+        gridY = np.floor((y_coords - self.gridBounds['y']) / self.cellHeight).astype(int)
+
+        # 生成唯一的网格单元键值对
+        keys = [f"{gx},{gy}" for gx, gy in zip(gridX, gridY)]
+
+        # 使用 numpy 进行批量操作，避免循环
+        unique_keys, counts = np.unique(keys, return_counts=True)
+
+        for i, key in enumerate(unique_keys):
+            # 计算网格中心
+            gx, gy = map(int, key.split(','))
             if key not in self.grid:
                 self.grid[key] = {
-                    'center': self.get_grid_center(gridX, gridY),
+                    'center': self.get_grid_center(gx, gy),
                     'count': 0
                 }
-            
-            # Increment the point count for this grid cell
-            self.grid[key]['count'] += 1
+
+            # 增加计数
+            self.grid[key]['count'] += counts[i]
 
     def get_grid_center(self, gridX, gridY):
         return {
@@ -38,12 +47,23 @@ class Grid:
         return self.grid
 
     def to_json(self):
-        return json.dumps({
-            'gridBounds': self.gridBounds,
-            'cellWidth': self.cellWidth,
-            'cellHeight': self.cellHeight,
-            'grid': self.grid
-        })
+            # 手动将数据转换为 Python 的基本数据类型，避免 JSON 序列化时的类型错误
+            return json.dumps({
+                'gridBounds': self.gridBounds,
+                'cellWidth': self.cellWidth,
+                'cellHeight': self.cellHeight,
+                'grid': self.grid
+            }, default=self.convert_to_builtin_type, indent=4)
+
+    @staticmethod
+    def convert_to_builtin_type(obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
 
 if __name__ == '__main__':
 

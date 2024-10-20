@@ -210,10 +210,11 @@ function eu(){
     });
 
     // 使用 Promise
-    Promise.all([dataFetchPromise, animationPromise])
-        .then(([updatedGeoJson]) => {
+    Promise.all([dataFetchPromise, animationPromise, fetch('data/eu_grid.json').then(response => response.json())])
+        .then(([updatedGeoJson, _, gridData]) => {
             // 更新或渲染 GeoJSON 图层，确保动画结束后执行
             geoJsonLayer.updateData(updatedGeoJson);
+            canvasLayer.appendGridJSON(gridData);
             // geoJsonLayer.updateInfoUpdate(eu_infoUpdate);
         })
         .catch(error => {
