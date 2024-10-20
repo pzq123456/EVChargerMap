@@ -91,6 +91,15 @@ export function initCanvasLayer() {
             }
         },
 
+        appendGridJSON(json){
+            this._grid.insertJSON(json);
+            this._stastics.appendGridData(this._grid);
+            this._resetCanvas();
+            if(this._legend){
+                this._legend.update();
+            }
+        },
+
         // 点击事件处理函数
         _onClick: function (e) {
             let zoom = this._map.getZoom();
@@ -241,8 +250,10 @@ export function initCanvasLayer() {
                 });
 
                 if (this._hoveredPoint) {
-                    radius = Math.pow(2, zoom) / 32 * Math.log2(grid[this._hoveredPointIndex][2] + 1) * 2;
-
+                    let point = grid[this._hoveredPointIndex];
+                    let latLng = L.latLng(point[0], point[1]);
+                    let color = this._stastics.mapValue2Color(point[2], true, this._colors);
+                    radius = Math.pow(2, zoom) / 64 * Math.log2(point[2] + 1) * 2;
 
                     this._ctx.beginPath();
                     this._ctx.arc(this._hoveredPoint.x, this._hoveredPoint.y, radius + 5, 0, 2 * Math.PI, true);
@@ -251,9 +262,11 @@ export function initCanvasLayer() {
                     // 虚线
                     this._ctx.setLineDash([5, 5]);
                     this._ctx.stroke();
+                    
                 }
                 
             }
+
             // else{
             //     // 并行绘制所有数据点
             //     this._data.forEach((latLng, index) => {

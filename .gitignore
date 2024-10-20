@@ -13,6 +13,7 @@ python/.venv/
 !data/USApoints.csv
 !data/us_states.json
 !data/GeoJSON
+!data/cn_grid.json
 
 data/GeoJSON/C/C_cn.geojson
 data/GeoJSON/C/C_eu.geojson

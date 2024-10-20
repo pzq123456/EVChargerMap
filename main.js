@@ -1,6 +1,6 @@
 // import L from './src/leaflet/LeafletWithGlobals.js';
 import { initGeoJsonLayer } from "./geojsonlayer.js";
-import { initDom } from './utils.js';
+// import { initDom } from './utils.js';
 import { baseMapInfos } from './baseMaps.js';
 import { initCanvasLayer } from './canvaslayer.js';
 import { getBaseMap } from './utils.js';
@@ -44,12 +44,12 @@ function cn() {
                     error: (error) => reject(error)
                 });
             })),
-        fetch('data/GeoJSON/cn_province.geojson')
-            .then(response => response.json())
+        fetch('data/GeoJSON/cn_province.geojson').then(response => response.json()),
     ])
-    .then(([csvData, geoJsonData]) => {
+    .then(([csvData, geoJsonData, gridData]) => {
         // 创建 Worker 实例
         const worker = new Worker('workers/cngeojson.js');
+
 
         return new Promise((resolve, reject) => {
             // 向 Worker 发送 GeoJSON 和 CSV 数据
@@ -74,6 +74,7 @@ function cn() {
                 reject(error);
             };
         });
+
     });
 
     // 创建一个动画时长的 Promise
@@ -84,10 +85,11 @@ function cn() {
     });
 
     // 使用 Promise.race 来决定何时更新数据
-    Promise.all([dataFetchPromise, animationPromise])
-        .then(([updatedGeoJson]) => {
+    Promise.all([dataFetchPromise, animationPromise, fetch('data/cn_grid.json').then(response => response.json())])
+        .then(([updatedGeoJson, _, gridData]) => {
             // 更新或渲染 GeoJSON 图层，确保动画结束后执行
             geoJsonLayer.updateData(updatedGeoJson);
+            canvasLayer.appendGridJSON(gridData);
             // geoJsonLayer.updateInfoUpdate(cn_infoUpdate);
         })
         .catch(error => {
@@ -106,12 +108,13 @@ function us(){
 
     Promise.allSettled([
         fetch('data/GeoJSON/us_states.json').then(response => response.json()),
-        fetch('data/USApoints.csv').then(response => response.text())
+        fetch('data/USApoints.csv').then(response => response.text()),
     ])
     .then(results => {
         // 处理结果
         const geoJsonResult = results[0];
         const csvResult = results[1];
+        const gridResult = results[2];
     
         if (geoJsonResult.status === 'fulfilled') {
             geoJsonLayer.updateData(geoJsonResult.value);
@@ -132,6 +135,7 @@ function us(){
     
                 chunk: function(results, parser) {
                     canvasLayer.appendData(results.data, (d) => [parseFloat(d.Latitude), parseFloat(d.Longitude)]);
+                    // console.log(canvasLayer._grid.grid);
                 },
             });
         } else {

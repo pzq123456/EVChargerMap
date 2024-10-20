@@ -29,6 +29,11 @@ export class Stastics {
         this.update();
     }
 
+    appendGridData(grid){
+        this._data.push(...grid.getSparseGridArray().map(d => d[2]));
+        this.update();
+    }
+
     // 根据内置的统计值进行值映射，支持拉伸函数
     mapValue(value, isReverse = false, stretch = 'linear') {
         let mappedValue = (value - this._min) / (this._max - this._min);
@@ -128,6 +133,35 @@ export class Grid {
         this.grid = {};                // 存储稀疏网格信息
     }
 
+    stringfy(){
+        return JSON.stringify(this);
+    }
+
+    static formJSON(json){
+        // create a new Grid instance from a JSON string
+        let obj = JSON.parse(json);
+        let grid = new Grid( obj.gridBounds, obj.cellWidth, obj.cellHeight);
+        grid.grid = obj.grid;
+        return grid;
+    }
+
+    insertJSON(json){
+        // append a JSON string to the grid
+        // 若传入的是字符串
+        let obj = json;
+        if (typeof json === 'string') {
+            obj = JSON.parse(json);
+        }
+        
+        for (let key in obj.grid){
+            if (this.grid[key]){
+                this.grid[key].count += obj.grid[key].count;
+            } else {
+                this.grid[key] = obj.grid[key];
+            }
+        }
+    }
+
     // 插入一组点并进行网格统计
     insertPoints(points) {
         points.forEach(point => {
@@ -184,10 +218,7 @@ export class Grid {
 
 // // 假设 pointsInGrid 是我们获取的地理坐标点数据
 // let pointsInGrid = [
-//   { x: -120, y: -45 },
-//   { x: -121, y: -46 },
-//   { x: -119, y: -44 },
-//   // 继续添加更多点
+//     [0, 0], [1, 1], [2, 2], [3, 3], [4, 4],
 // ];
 
 // // 插入点并进行网格统计
@@ -196,5 +227,11 @@ export class Grid {
 // // 获取稀疏网格数据
 // let sparseGrid = grid.getSparseGrid();
 // console.log(sparseGrid);
+
+// grid.insertJSON(`
+//     {"gridBounds": {"x": -180, "y": -90, "w": 360, "h": 180}, "cellWidth": 1, "cellHeight": 1, "grid": {"10,10": {"center": {"x": -169.5, "y": -79.5}, "count": 3}, "20,20": {"center": {"x": -159.5, "y": -69.5}, "count": 1}, "20,15": {"center": {"x": -159.5, "y": -74.5}, "count": 1}, "25,18": {"center": {"x": -154.5, "y": -71.5}, "count": 1}, "10,8": {"center": {"x": -169.5, "y": -81.5}, "count": 1}}}
+// `);
+
+// console.log(grid.getSparseGrid());
 
   
