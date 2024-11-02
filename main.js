@@ -8,17 +8,16 @@ import { getBaseMap } from './utils.js';
 // components
 import {CountrySwitcher} from "./components/country-switcher.js";
 
+import {interpolateColors} from "./color.js";
+
 initCanvasLayer();
 initGeoJsonLayer();
+// cache
+let cache = {};
 
 // 注册 Web Component
 customElements.define('country-switcher', CountrySwitcher);
 const switcher = document.querySelector('country-switcher');
-
-// cache
-let cnGeoJsonData = null;
-let usGeoJsonData = null;
-let euGeoJsonData = null;
 
 function cn() {
     const animationDuration = 2000; // 动画时长 2 秒（以毫秒为单位）
@@ -50,7 +49,6 @@ function cn() {
         // 创建 Worker 实例
         const worker = new Worker('workers/cngeojson.js');
 
-
         return new Promise((resolve, reject) => {
             // 向 Worker 发送 GeoJSON 和 CSV 数据
             worker.postMessage({ geoJsonData, csvData });
@@ -58,9 +56,6 @@ function cn() {
             // 当 Worker 任务完成时接收数据
             worker.onmessage = function (e) {
                 const updatedGeoJson = e.data;
-
-                cnGeoJsonData = updatedGeoJson; // 缓存数据
-
                 // 终止 Worker
                 worker.terminate();
                 
@@ -90,6 +85,11 @@ function cn() {
             // 更新或渲染 GeoJSON 图层，确保动画结束后执行
             geoJsonLayer.updateData(updatedGeoJson);
             canvasLayer.appendGridJSON(gridData);
+
+            if(!cache.cn){
+                cache.cn = updatedGeoJson;
+            }
+
             // geoJsonLayer.updateInfoUpdate(cn_infoUpdate);
         })
         .catch(error => {
@@ -114,14 +114,10 @@ function us(){
         // 处理结果
         const geoJsonResult = results[0];
         const csvResult = results[1];
-        const gridResult = results[2];
     
         if (geoJsonResult.status === 'fulfilled') {
             geoJsonLayer.updateData(geoJsonResult.value);
-
-            // cache data
-            usGeoJsonData = geoJsonResult.value;
-
+            cache.us = geoJsonResult.value;
         } else {
             console.error('获取 GeoJSON 数据失败:', geoJsonResult.reason);
         }
@@ -135,7 +131,6 @@ function us(){
     
                 chunk: function(results, parser) {
                     canvasLayer.appendData(results.data, (d) => [parseFloat(d.Latitude), parseFloat(d.Longitude)]);
-                    // console.log(canvasLayer._grid.grid);
                 },
             });
         } else {
@@ -184,9 +179,6 @@ function eu(){
                 // 当 Worker 任务完成时接收数据
                 worker.onmessage = function (e) {
                     const updatedGeoJson = e.data;
-
-                    euGeoJsonData = updatedGeoJson; // 缓存数据
-
                     // 终止 Worker
                     worker.terminate();
                     
@@ -215,7 +207,11 @@ function eu(){
             // 更新或渲染 GeoJSON 图层，确保动画结束后执行
             geoJsonLayer.updateData(updatedGeoJson);
             canvasLayer.appendGridJSON(gridData);
-            // geoJsonLayer.updateInfoUpdate(eu_infoUpdate);
+
+            // cache.eu = updatedGeoJson;
+            if(!cache.eu){
+                cache.eu = updatedGeoJson;
+            }
         })
         .catch(error => {
             console.error('获取数据或处理出错:', error);
@@ -247,65 +243,123 @@ function customPopupRenderer(info){
     </div>`;
 }
 
-
-
 const infoUpdate = function (props, data) {
     const contents = props ? `<b>${props.name}</b><br />${props.count} charging stations` : 'Hover over a state';
     this._div.innerHTML = `<h4>US EV Charging Stations</h4>${contents}`;
 }
-// const cn_infoUpdate = function (props, data) {
-//     const contents = props ? `<b>${props.pr_name}</b><br />${props.count} charging stations` : 'Hover over a state';
-//     this._div.innerHTML = `<h4>China EV Charging Stations</h4>${contents}`;
-// }
-
-// const eu_infoUpdate = function (props, data) {
-//     const contents = props ? `<b>${props.NAME}</b><br />${props.count} charging stations` : 'Hover over a state';
-//     this._div.innerHTML = `<h4>Europe EV Charging Stations</h4>${contents}`;
-// }
 
 const geoJsonLayer = L.geoJsonLayer(infoUpdate);
 const canvasLayer = L.canvasLayer(customPopupRenderer);
+const C_geoJsonLayer = L.geoJsonLayer(C_infoUpdate);
+
+const C_Colors = interpolateColors("#ebc8d2", "#ff0000", 16);
+C_geoJsonLayer.setColors(C_Colors);
 
 layerControl.addOverlay(geoJsonLayer, 'State Station Count');
 layerControl.addOverlay(canvasLayer, 'Charging Stations');
+layerControl.addOverlay(C_geoJsonLayer, 'Population Density');
 
-// layerControl.expand();
-geoJsonLayer.addTo(map);
-// canvasLayer.addTo(map);
+C_geoJsonLayer.addTo(map);
 
-// C_us();
+function C_us(){
+    if(cache.c_us){
+        C_geoJsonLayer.updateData(cache.c_us, (d) => parseFloat(d.properties.V));
+        return;
+    }
+    fetch('data/GeoJSON/C/C_us_no_null.geojson')
+        .then(response => response.json())
+        .then(geoJsonData => {
+            // C_geoJsonLayer.addTo(map);
+            C_geoJsonLayer.updateData(geoJsonData, (d) => parseFloat(d.properties.V));
+            if(!cache.c_us){
+                cache.c_us = geoJsonData;
+            }
 
-// function C_us(){
-//     // data\GeoJSON\C\C_us.geojson
-//     fetch('data/GeoJSON/C/C_us.geojson')
-//         .then(response => response.json())
-//         .then(geoJsonData => {
-//             console.log('获取数据成功:', geoJsonData);
-//             geoJsonLayer.updateData(geoJsonData, (d) => parseFloat(d.properties.V));
-//             console.log('geoJsonLayer:', geoJsonLayer);
-//         })
-//         .catch(error => {
-//             console.error('获取数据出错:', error);
-//         });
-// }
+        })
+        .catch(error => {
+            console.error('获取数据出错:', error);
+        });
+}
 
-// const c_US_infoUpdate = function (props, data) {
-//     const contents = props ? `<b>${props.NAME_1}-${props.NAME_2}</b><br />${props.V} (density)` : 'Hover over a state';
-//     this._div.innerHTML = `<h4>population density</h4>${contents}`;
-// }
+// C_cn();
+
+function C_cn(){
+    if(cache.c_cn){
+        C_geoJsonLayer.updateData(cache.c_cn, (d) => parseFloat(d.properties.V));
+        return;
+    }
+    fetch('data/GeoJSON/C/C_cn_no_null.geojson')
+        .then(response => response.json())
+        .then(geoJsonData => {
+            // C_geoJsonLayer.addTo(map);
+            C_geoJsonLayer.updateData(geoJsonData, (d) => parseFloat(d.properties.V));
+
+            if(!cache.c_cn){
+                cache.c_cn = geoJsonData;
+            }
+        })
+        .catch(error => {
+            console.error('获取数据出错:', error);
+        });
+}
+
+// C_eu();
+
+function C_eu(){
+
+    if(cache.c_eu){
+        C_geoJsonLayer.updateData(cache.c_eu, (d) => parseFloat(d.properties.V));
+        return;
+    }
+
+    fetch('data/GeoJSON/C/C_eu_no_null.geojson')
+        .then(response => 
+            {
+                return response.json();
+            }
+        )
+        .then(geoJsonData => {
+
+            C_geoJsonLayer.updateData(geoJsonData, (d) => parseFloat(d.properties.V));
+
+            if(!cache.c_eu){
+                cache.c_eu = geoJsonData;
+            }
+        })
+        .catch(error => {
+            console.error('获取数据出错:', error);
+        });
+}
+
+function C_infoUpdate(props, data) {
+    const contents = props ? `<b>${props.NAME_1}-${props.NAME_2}</b><br />${props.V} (density)` : 'Hover over a state';
+    this._div.innerHTML = `<h4>population density</h4>${contents}`;
+}
 
 switcher.setCountries([
     {
         name: 'USA',
-        callback: us
+
+        callback: () => {
+            us();
+            C_us();
+        }
     },
     {
         name: 'China',
-        callback: cn
+
+        callback: () => {
+            cn();
+            C_cn();
+        }
     },
     {
         name: 'Europe',
-        callback: eu
+
+        callback: () => {
+            eu();
+            C_eu();
+        }
     },
     {
         name: 'global',
@@ -316,17 +370,44 @@ switcher.setCountries([
                 animate: true
             });
 
-            if (usGeoJsonData) {
-                geoJsonLayer.appendData(usGeoJsonData);
+            geoJsonLayer.clear();
+
+            if (cache.cn) {
+                geoJsonLayer.appendData(cache.cn);
             }
 
-            if (cnGeoJsonData) {
-                geoJsonLayer.appendData(cnGeoJsonData);
+            if (cache.us) {
+                geoJsonLayer.appendData(cache.us);
             }
 
-            if (euGeoJsonData) {
-                geoJsonLayer.appendData(euGeoJsonData);
+            if (cache.eu) {
+                geoJsonLayer.appendData(cache.eu);
             }
+
+            C_geoJsonLayer.clear();
+
+            if (cache.c_us) {
+                C_geoJsonLayer.appendData(cache.c_us, (d) => parseFloat(d.properties.V));
+            }
+
+            if (cache.c_cn) {
+                C_geoJsonLayer.appendData(cache.c_cn, (d) => parseFloat(d.properties.V));
+            }
+
+            if (cache.c_eu) {
+                C_geoJsonLayer.appendData(cache.c_eu, (d) => parseFloat(d.properties.V));
+            }
+
         }
     }
 ]);
+
+closeLoadingBar();
+
+function closeLoadingBar(){
+    document.getElementById("loading-bar").style.display = "none";
+}
+
+function openLoadingBar(){
+    document.getElementById("loading-bar").style.display = "block";
+}

@@ -14,7 +14,9 @@ export function initGeoJsonLayer() { // 这一步只是 向L注册了一个新�
 
         setColors: function (colors) {
             this._colors = colors;
-            this._legend.update();
+            if (this._legend){
+                this._legend.update();
+            }
         },
 
         _getColor: function (d) {
@@ -32,23 +34,38 @@ export function initGeoJsonLayer() { // 这一步只是 向L注册了一个新�
             };
         },
 
+        clear: function () {
+            this._data = DefaultGeoJson;
+            this._stastics.clear();
+            if (this._geoJson) {
+                this._geoJson.clearLayers();
+                this._legend.update();
+            }
+        },
+
         updateData: function (data, getVal = (d) => parseInt(d.properties.count)) {
             this._data = data;
             this._stastics.clear();
             this._stastics.append(data.features, getVal);
             this._getVal = getVal;
+            if (this._geoJson) {
+                this._geoJson.clearLayers();
+                this._geoJson.addData(data);
+                this._legend.update();
+            }
 
-            this._geoJson.clearLayers();
-            this._geoJson.addData(data);
-            this._legend.update();
         },
 
         appendData: function (data, getVal = (d) => parseInt(d.properties.count)) {
             this._data.features = this._data.features.concat(data.features);
             this._stastics.append(data.features, getVal);
             this._getVal = getVal;
-            this._geoJson.addData(data);
-            this._legend.update();
+
+            if (this._geoJson) {
+                this._geoJson.clearLayers();
+                this._geoJson.addData(data);
+                this._legend.update();
+            }
         },
 
         onAdd: function (map) {

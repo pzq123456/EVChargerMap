@@ -1,0 +1,27 @@
+/data
+    /C
+        /cn.griddataformat
+        /us.griddataformat
+        /eu.griddataformat
+    /D
+        /cn.griddataformat
+        /us.griddataformat
+        /eu.griddataformat
+    /E
+        /cn.griddataformat
+        /us.griddataformat
+        /eu.griddataformat
+    /F
+        /cn.griddataformat
+        /us.griddataformat
+        /eu.griddataformat
+
+WGS84 -90, -180, 90, 180
+1*1 degree grid
+180 rows, 360 columns
+total 64800 cells
+0.5*0.5 degree grid
+360 rows, 720 columns
+total 259200 cells
+
+float 32bit
