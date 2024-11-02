@@ -23,3 +23,6 @@ __pycache__
 data/GeoJSON/C/C_cn.geojson
 data/GeoJSON/C/C_eu.geojson
 data/GeoJSON/C/C_us.geojson
+data/GeoJSON/C/C_cn_no_null.geojson
+data/GeoJSON/C/C_eu_no_null.geojson
+data/GeoJSON/C/C_us_no_null.geojson

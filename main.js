@@ -259,7 +259,8 @@ layerControl.addOverlay(geoJsonLayer, 'State Station Count');
 layerControl.addOverlay(canvasLayer, 'Charging Stations');
 layerControl.addOverlay(C_geoJsonLayer, 'Population Density');
 
-C_geoJsonLayer.addTo(map);
+// C_geoJsonLayer.addTo(map);
+geoJsonLayer.addTo(map);
 
 function C_us(){
     if(cache.c_us){
@@ -342,7 +343,7 @@ switcher.setCountries([
 
         callback: () => {
             us();
-            C_us();
+            // C_us();
         }
     },
     {
@@ -350,7 +351,7 @@ switcher.setCountries([
 
         callback: () => {
             cn();
-            C_cn();
+            // C_cn();
         }
     },
     {
@@ -358,7 +359,7 @@ switcher.setCountries([
 
         callback: () => {
             eu();
-            C_eu();
+            // C_eu();
         }
     },
     {
@@ -370,7 +371,7 @@ switcher.setCountries([
                 animate: true
             });
 
-            geoJsonLayer.clear();
+            // geoJsonLayer.clear();
 
             if (cache.cn) {
                 geoJsonLayer.appendData(cache.cn);
