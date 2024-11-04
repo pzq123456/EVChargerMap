@@ -19,6 +19,7 @@ __pycache__
 !data/us_states.json
 !data/GeoJSON
 !data/cn_grid.json
+!data/timezone
 
 data/GeoJSON/C/C_cn.geojson
 data/GeoJSON/C/C_eu.geojson
