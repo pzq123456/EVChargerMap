@@ -81,3 +81,7 @@ rastertiles/voyager_labels_under
 - https://blog.sumbera.com/2014/06/08/leaflet-webgl-many-points-rendering/
 ## References
 - https://www.cnblogs.com/wangsongbai/p/13444667.html
+
+
+## HeatMap!
+https://github.com/Leaflet/Leaflet.heat
