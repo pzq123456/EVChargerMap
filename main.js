@@ -259,7 +259,7 @@ layerControl.addOverlay(geoJsonLayer, 'State Station Count');
 layerControl.addOverlay(canvasLayer, 'Charging Stations');
 layerControl.addOverlay(C_geoJsonLayer, 'Population Density');
 
-// C_geoJsonLayer.addTo(map);
+C_geoJsonLayer.addTo(map);
 geoJsonLayer.addTo(map);
 
 function C_us(){
@@ -267,11 +267,12 @@ function C_us(){
         C_geoJsonLayer.updateData(cache.c_us, (d) => parseFloat(d.properties.V));
         return;
     }
-    fetch('data/GeoJSON/C/C_us_no_null.geojson')
+    fetch('data/GeoJSON/C/C_us_sim.geojson')
         .then(response => response.json())
         .then(geoJsonData => {
             // C_geoJsonLayer.addTo(map);
             C_geoJsonLayer.updateData(geoJsonData, (d) => parseFloat(d.properties.V));
+            // C_geoJsonLayer.appendData(geoJsonData, (d) => parseFloat(d.properties.V));
             if(!cache.c_us){
                 cache.c_us = geoJsonData;
             }
@@ -289,11 +290,13 @@ function C_cn(){
         C_geoJsonLayer.updateData(cache.c_cn, (d) => parseFloat(d.properties.V));
         return;
     }
-    fetch('data/GeoJSON/C/C_cn_no_null.geojson')
+    fetch('data/GeoJSON/C/C_cn_sim.geojson')
         .then(response => response.json())
         .then(geoJsonData => {
             // C_geoJsonLayer.addTo(map);
             C_geoJsonLayer.updateData(geoJsonData, (d) => parseFloat(d.properties.V));
+            // C_geoJsonLayer.appendData(geoJsonData, (d) => parseFloat(d.properties.V));
+
 
             if(!cache.c_cn){
                 cache.c_cn = geoJsonData;
@@ -313,7 +316,7 @@ function C_eu(){
         return;
     }
 
-    fetch('data/GeoJSON/C/C_eu_no_null.geojson')
+    fetch('data/GeoJSON/C/C_eu_sim.geojson')
         .then(response => 
             {
                 return response.json();
@@ -322,6 +325,8 @@ function C_eu(){
         .then(geoJsonData => {
 
             C_geoJsonLayer.updateData(geoJsonData, (d) => parseFloat(d.properties.V));
+            // C_geoJsonLayer.appendData(geoJsonData, (d) => parseFloat(d.properties.V));
+
 
             if(!cache.c_eu){
                 cache.c_eu = geoJsonData;
@@ -342,24 +347,24 @@ switcher.setCountries([
         name: 'USA',
 
         callback: () => {
-            us();
-            // C_us();
+            // us();
+            C_us();
         }
     },
     {
         name: 'China',
 
         callback: () => {
-            cn();
-            // C_cn();
+            // cn();
+            C_cn();
         }
     },
     {
         name: 'Europe',
 
         callback: () => {
-            eu();
-            // C_eu();
+            // eu();
+            C_eu();
         }
     },
     {
@@ -385,7 +390,7 @@ switcher.setCountries([
                 geoJsonLayer.appendData(cache.eu);
             }
 
-            C_geoJsonLayer.clear();
+            // C_geoJsonLayer.clear();
 
             if (cache.c_us) {
                 C_geoJsonLayer.appendData(cache.c_us, (d) => parseFloat(d.properties.V));
