@@ -159,15 +159,17 @@ export function initGeoJsonLayer() { // 这一步只是 向L注册了一个新�
             // console.log(grades);
             const colors = [];
 
-            labels.push('area level');
+            labels.push('legend');
 
             for (let i = 0; i < grades.length - 1; i++) {
                 colors.push(this._stastics.mapValue2Color(grades[i], false, this._colors));
             }
 
             for (let i = 0; i < grades.length - 1; i++) {
-                from = grades[i];
-                to = grades[i + 1];
+                // from = grades[i];
+                // to = grades[i + 1];
+                from = bigNumberFormat(grades[i]);
+                to = bigNumberFormat(grades[i + 1]);
                 labels.push(`<i style="background:${colors[i]}"></i> ${from}${to ? `&ndash;${to}` : '+'}`);
             }
 
@@ -193,3 +195,18 @@ const DefaultGeoJson = {
 }
 
 const DefaultColors = ['#f7fcf5', '#e5f5e0', '#c7e9c0', '#a1d99b', '#74c476', '#41ab5d', '#238b45', '#006d2c', '#00441b', '#003d19', '#003617', '#003015', '#002b13', '#002611', '#00200f', '#001b0d', '#00160b']
+
+// 帮助函数 当数字过大时，将数字转化为科学计数法
+// 例如 1000000 -> 1e6
+
+function bigNumberFormat(num) {
+    if (num < 1e3) {
+        return num;
+    } else if (num < 1e6) {
+        return (num / 1e3).toFixed(1) + 'K';
+    } else if (num < 1e9) {
+        return (num / 1e6).toFixed(1) + 'M';
+    } else {
+        return (num / 1e9).toFixed(1) + 'B';
+    }
+}

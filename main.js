@@ -15,9 +15,52 @@ initGeoJsonLayer();
 // cache
 let cache = {};
 
+const colorsets = [
+    ['#f7fbff','#deebf7','#c6dbef','#9ecae1','#6baed6','#4292c6','#2171b5','#08519c','#08306b'], // blue
+    ['#ffffd9','#edf8b1','#c7e9b4','#7fcdbb','#41b6c4','#1d91c0','#225ea8','#253494','#081d58'], // blue-green
+    ['#ffffe5','#f7fcb9','#d9f0a3','#addd8e','#78c679','#41ab5d','#238443','#006837','#004529'], // green
+    ['#f7f4f9','#e7e1ef','#d4b9da','#c994c7','#df65b0','#e7298a','#ce1256','#980043','#67001f'], // red
+    ['#fcfbfd','#efedf5','#dadaeb','#bcbddc','#9e9ac8','#807dba','#6a51a3','#54278f','#3f007d'], // purple
+    ['#fff5eb','#fee6ce','#fdd0a2','#fdae6b','#fd8d3c','#f16913','#d94801','#a63603','#7f2704'], // orange
+    ['#fff7f3','#fde0dd','#fcc5c0','#fa9fb5','#f768a1','#dd3497','#ae017e','#7a0177','#49006a'], // pink
+];
+
 // 注册 Web Component
 customElements.define('country-switcher', CountrySwitcher);
 const switcher = document.querySelector('country-switcher');
+
+function flayTo(name){
+    switch (name) {
+        case 'USA':
+            map.flyTo([37.8, -96], 4, {
+                duration: 2,
+                easeLinearity: 0.5,
+                animate: true
+            });
+            break;
+        case 'China':
+            map.flyTo([35, 105], 4, {
+                duration: 2,
+                easeLinearity: 0.5,
+                animate: true
+            });
+            break;
+        case 'Europe':
+            map.flyTo([50, 10], 4, {
+                duration: 2,
+                easeLinearity: 0.5,
+                animate: true
+            });
+            break;
+        case 'global':
+            map.flyTo([0, 0], 2, {
+                duration: 2,
+                easeLinearity: 0.5,
+                animate: true
+            });
+            break;
+    }
+}
 
 function cn() {
     const animationDuration = 2000; // 动画时长 2 秒（以毫秒为单位）
@@ -251,18 +294,25 @@ const infoUpdate = function (props, data) {
 const geoJsonLayer = L.geoJsonLayer(infoUpdate);
 const canvasLayer = L.canvasLayer(customPopupRenderer);
 const C_geoJsonLayer = L.geoJsonLayer(C_infoUpdate);
+const D_geoJsonLayer = L.geoJsonLayer(D_infoUpdate);
 
 const C_Colors = interpolateColors("#ebc8d2", "#ff0000", 16);
 C_geoJsonLayer.setColors(C_Colors);
 
+const D_Colors = colorsets[1];
+D_geoJsonLayer.setColors(D_Colors);
+
 layerControl.addOverlay(geoJsonLayer, 'State Station Count');
 layerControl.addOverlay(canvasLayer, 'Charging Stations');
 layerControl.addOverlay(C_geoJsonLayer, 'Population Density');
+layerControl.addOverlay(D_geoJsonLayer, 'Housing Price Index');
 
-C_geoJsonLayer.addTo(map);
-geoJsonLayer.addTo(map);
+D_geoJsonLayer.addTo(map);
+// C_geoJsonLayer.addTo(map);
+// geoJsonLayer.addTo(map);
 
 function C_us(){
+    flayTo('USA');
     if(cache.c_us){
         C_geoJsonLayer.updateData(cache.c_us, (d) => parseFloat(d.properties.V));
         return;
@@ -286,6 +336,7 @@ function C_us(){
 // C_cn();
 
 function C_cn(){
+    flayTo('China');
     if(cache.c_cn){
         C_geoJsonLayer.updateData(cache.c_cn, (d) => parseFloat(d.properties.V));
         return;
@@ -310,7 +361,7 @@ function C_cn(){
 // C_eu();
 
 function C_eu(){
-
+    flayTo('Europe');
     if(cache.c_eu){
         C_geoJsonLayer.updateData(cache.c_eu, (d) => parseFloat(d.properties.V));
         return;
@@ -341,6 +392,51 @@ function C_infoUpdate(props, data) {
     const contents = props ? `<b>${props.NAME_1}-${props.NAME_2}</b><br />${props.V} (density)` : 'Hover over a state';
     this._div.innerHTML = `<h4>population density</h4>${contents}`;
 }
+// dataprocess\output\D\us.geojson
+function D_us(){
+    flayTo('USA');
+    if(cache.d_us){
+        D_geoJsonLayer.updateData(cache.d_us, (d) => parseFloat(d.properties["mean_1500buffer-city"]));
+        return;
+    }
+    fetch('dataprocess/output/D/us.geojson')
+        .then(response => response.json())
+        .then(geoJsonData => {
+            D_geoJsonLayer.updateData(geoJsonData, (d) => parseFloat(d.properties["mean_1500buffer-city"]));
+            if(!cache.d_us){
+                cache.d_us = geoJsonData;
+            }
+
+        })
+        .catch(error => {
+            console.error('获取数据出错:', error);
+        });
+}
+
+function D_cn(){
+    flayTo('China');
+    if(cache.d_cn){
+        D_geoJsonLayer.updateData(cache.d_cn, (d) => parseFloat(d.properties["mean_1500buffer-city"]));
+        return;
+    }
+    fetch('dataprocess/output/D/cn.geojson')
+        .then(response => response.json())
+        .then(geoJsonData => {
+            D_geoJsonLayer.updateData(geoJsonData, (d) => parseFloat(d.properties["mean_1500buffer-city"]));
+            if(!cache.d_cn){
+                cache.d_cn = geoJsonData;
+            }
+
+        })
+        .catch(error => {
+            console.error('获取数据出错:', error);
+        });
+}
+
+function D_infoUpdate(props, data) {
+    const contents = props ? `<b>${props.NAME_1}-${props.NAME_2}</b><br />${props["mean_1500buffer-city"]}` : 'Hover over a state';
+    this._div.innerHTML = `<h4>Housing Price Index</h4>${contents}`;
+}
 
 switcher.setCountries([
     {
@@ -348,7 +444,8 @@ switcher.setCountries([
 
         callback: () => {
             // us();
-            C_us();
+            // C_us();
+            D_us();
         }
     },
     {
@@ -356,16 +453,18 @@ switcher.setCountries([
 
         callback: () => {
             // cn();
-            C_cn();
+            // C_cn();
+            // C_cn
+            D_cn();
         }
     },
     {
         name: 'Europe',
 
-        callback: () => {
-            // eu();
-            C_eu();
-        }
+        // callback: () => {
+        //     // eu();
+        //     // C_eu();
+        // }
     },
     {
         name: 'global',
@@ -403,6 +502,17 @@ switcher.setCountries([
             if (cache.c_eu) {
                 C_geoJsonLayer.appendData(cache.c_eu, (d) => parseFloat(d.properties.V));
             }
+
+            // D_geoJsonLayer.clear();
+            if (cache.d_us) {
+                D_geoJsonLayer.appendData(cache.d_us, (d) => parseFloat(d.properties["mean_1500buffer-city"]));
+            }
+
+            if (cache.d_cn) {
+                D_geoJsonLayer.appendData(cache.d_cn, (d) => parseFloat(d.properties["mean_1500buffer-city"]));
+            }
+
+
 
         }
     }
