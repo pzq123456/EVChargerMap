@@ -98,28 +98,43 @@ def process1(PATH2, column = 'norm', SAVEDDIR = 'D', SAVVNAME = 'us'):
         gdf['geometry'] = gdf['geometry'].simplify(0.01)
         gdf.to_file(os.path.join(SAVE_PATH,SAVEDDIR, savename), driver='GeoJSON')
 
+def process2(PATH2, column = 'norm', SAVEDDIR = 'D', SAVENAME = 'us'): 
+    files = scan_files(PATH2, '.shp')
 
+    savename = SAVENAME + '.geojson'
+    gdf = read_shp(os.path.join(PATH2, files[0]))
+    for file in tqdm.tqdm(files[1:]):
+        tmpGdf = read_shp(os.path.join(PATH2, file))
+        columnName = file.split('.')[0]
+        tmpGdf = rename_columns(tmpGdf, column, columnName)
+        gdf = merge_gdf(gdf, tmpGdf, columnName)
+
+    gdf.drop(columns=[column], inplace=True)
+    gdf['geometry'] = gdf['geometry'].simplify(0.01)
+    gdf.to_file(os.path.join(SAVE_PATH, SAVEDDIR, savename), driver='GeoJSON')
 
 if __name__ == '__main__':
     # SAVE_PATH = os.path.join(DIR, 'output')
     # dataprocess\output\F\cn-city.geojson
 
-    PATH12 = os.path.join(SAVE_PATH,'F')
+    # PATH12 = os.path.join(SAVE_PATH,'F')
 
-    NAMES = [
-        ['cn-city.geojson','cnr-city.geojson'],
-        ['eu-city.geojson','eur-city.geojson'],
-        ['us-city.geojson','usr-city.geojson']
-    ]
+    # NAMES = [
+    #     ['cn-city.geojson','cnr-city.geojson'],
+    #     ['eu-city.geojson','eur-city.geojson'],
+    #     ['us-city.geojson','usr-city.geojson']
+    # ]
 
-    for name in NAMES:
-        gdf1 = gpd.read_file(os.path.join(PATH12, name[0]))
-        gdf2 = gpd.read_file(os.path.join(PATH12, name[1]))
-        gdf1 = merge_diff(gdf1, gdf2)
-        gdf1.to_file(os.path.join(PATH12, name[0]), driver='GeoJSON')
+    # for name in NAMES:
+    #     gdf1 = gpd.read_file(os.path.join(PATH12, name[0]))
+    #     gdf2 = gpd.read_file(os.path.join(PATH12, name[1]))
+    #     gdf1 = merge_diff(gdf1, gdf2)
+    #     gdf1.to_file(os.path.join(PATH12, name[0]), driver='GeoJSON')
 
 
-    # path = PATH11
+    path = PATH8
+
+    process2(path, column = 'density_r', SAVEDDIR = 'F', SAVENAME = 'eur')
 
     # # 读取 shapefile 文件 并返回 GeoDataFrame
     # files = scan_files(path, '.shp')
