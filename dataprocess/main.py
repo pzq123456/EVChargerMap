@@ -108,7 +108,7 @@ if __name__ == '__main__':
 
     NAMES = [
         ['cn-city.geojson','cnr-city.geojson'],
-        ['eur-city.geojson','eur-city.geojson'],
+        ['eu-city.geojson','eur-city.geojson'],
         ['us-city.geojson','usr-city.geojson']
     ]
 
