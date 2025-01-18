@@ -237,13 +237,13 @@ export function initCanvasLayer() {
                     let point = this._map.latLngToContainerPoint(L.latLng(gridInfo[0], gridInfo[1]));
                     let color = this._stastics.mapValue2Color(gridInfo[2], true, this._colors);
 
-                    radius = Math.pow(2, zoom) / 64 * Math.log2(gridInfo[2] + 1) * 2;
+                    // radius = Math.pow(2, zoom) / 64 * Math.log2(gridInfo[2] + 1) * 2;
+                    // radius = Math.pow(2, zoom);
 
+                    let rect = calculateGridSize(gridInfo[0], zoom, 0.5);
 
                     this._ctx.beginPath();
-                    this._ctx.arc(point.x, point.y, radius, 0, 2 * Math.PI, true);
-                    // 绘制为正方形 以 point 为中心
-                    // this._ctx.rect(point.x - radius, point.y - radius, radius * 2, radius * 2);
+                    this._ctx.rect(point.x - rect.width / 2, point.y - rect.height / 2, rect.width * 2, rect.height * 2);
                     // 亮黄色
                     this._ctx.fillStyle = color;
                     this._ctx.fill();
@@ -253,10 +253,11 @@ export function initCanvasLayer() {
                     let point = grid[this._hoveredPointIndex];
                     let latLng = L.latLng(point[0], point[1]);
                     let color = this._stastics.mapValue2Color(point[2], true, this._colors);
-                    radius = Math.pow(2, zoom) / 64 * Math.log2(point[2] + 1) * 2;
+
+                    let rect = calculateGridSize(point[0], zoom, 0.5);
 
                     this._ctx.beginPath();
-                    this._ctx.arc(this._hoveredPoint.x, this._hoveredPoint.y, radius + 5, 0, 2 * Math.PI, true);
+                    this._ctx.rect(this._hoveredPoint.x - rect.width / 2, this._hoveredPoint.y - rect.height / 2, rect.width * 2, rect.height * 2);
                     this._ctx.strokeStyle = 'yellow';
                     this._ctx.lineWidth = 5;
                     // 虚线
@@ -375,4 +376,27 @@ export function initCanvasLayer() {
         canvasLayer._customPopupRenderer = customPopupRenderer;
         return canvasLayer;
     };
+}
+
+
+// // 计算对应纬度下 对应纬度差的像素分辨率 例如 0.5 度的纬度差对应的像素分辨率
+// function calculateGroundResolutionByDeltaLatitude(latitude, deltaLatitude, zoomLevel) {
+//     let earthRadius = 6378137;
+//     let lat = latitude * Math.PI / 180;
+//     let deltaLat = deltaLatitude * Math.PI / 180;
+
+//     let resolution = Math.cos(lat) * 2 * Math.PI * earthRadius / Math.pow(2, zoomLevel + 8) * deltaLat;
+//     return resolution;
+// }
+
+
+// 计算网格宽度与高度（考虑纬度的影响）
+function calculateGridSize(lat, zoom, gridSize = 0.5) {
+    // 经度的网格宽度 (单位: 像素)
+    const width = 256 * Math.pow(2, zoom) * gridSize / 360;
+
+    // 纬度的网格高度，需要乘上cos(latitude)
+    const height = width / Math.cos(lat * Math.PI / 180);
+
+    return { width, height };
 }

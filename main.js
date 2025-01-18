@@ -443,9 +443,9 @@ switcher.setCountries([
         name: 'USA',
 
         callback: () => {
-            // us();
+            us();
             // C_us();
-            D_us();
+            // D_us();
         }
     },
     {
@@ -461,10 +461,10 @@ switcher.setCountries([
     {
         name: 'Europe',
 
-        // callback: () => {
-        //     // eu();
-        //     // C_eu();
-        // }
+        callback: () => {
+            eu();
+            // C_eu();
+        }
     },
     {
         name: 'global',
